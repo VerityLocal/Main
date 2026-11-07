@@ -1,0 +1,12 @@
+{
+  "token": "GENERATE_WITH_HELPER_INIT_DO_NOT_USE_THIS_PLACEHOLDER",
+  "origins": [],
+  "max_queries": 24,
+  "signals": {
+    "text": {"enabled": false, "path": "/private/models/text-detector", "snapshot_id": "REVIEWED_REVISION", "asset_manifest": "/private/manifests/text.json", "asset_manifest_sha256": "REPLACE_WITH_VERIFIED_SHA256", "license_reviewed": false, "weight": 0.7, "max_tokens": 768},
+    "ratio": {"enabled": false, "observer": "/private/models/observer", "performer": "/private/models/performer", "snapshot_id": "REVIEWED_PAIR_REVISION", "asset_manifest": "/private/manifests/ratio.json", "asset_manifest_sha256": "REPLACE_WITH_VERIFIED_SHA256", "license_reviewed": false, "weight": 0.3, "center": 0.9015310749276843, "scale": 0.1, "max_tokens": 512},
+    "code": {"enabled": false, "path": "/private/models/code-classifier", "snapshot_id": "REVIEWED_REVISION", "asset_manifest": "/private/manifests/code.json", "asset_manifest_sha256": "REPLACE_WITH_VERIFIED_SHA256", "license_reviewed": false, "ai_label_index": 1, "weight": 0.8, "max_tokens": 512},
+    "code_match": {"enabled": false, "corpus": "/private/data/known-ai-code.json", "snapshot_id": "REVIEWED_CORPUS_REVISION", "asset_manifest": "/private/manifests/code-match.json", "asset_manifest_sha256": "REPLACE_WITH_VERIFIED_SHA256", "license_reviewed": false, "weight": 0.2}
+  },
+  "semantic": {"enabled": false, "path": "/private/models/embeddings", "snapshot_id": "REVIEWED_REVISION", "asset_manifest": "/private/manifests/semantic.json", "asset_manifest_sha256": "REPLACE_WITH_VERIFIED_SHA256", "license_reviewed": false}
+}

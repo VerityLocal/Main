@@ -1,0 +1,128 @@
+{
+  "timestamp": "2026-11-05T08:54:39.984924+00:00",
+  "kind": "synthetic_training_smoke_not_authorship_training_or_accuracy_benchmark",
+  "model_id": "microsoft/deberta-v3-small",
+  "model_revision": "a36c739020e01763fe789b4b85e2df55d6180012",
+  "execution": {
+    "device": "cuda:0",
+    "precision": "bf16",
+    "torch_version": "2.7.0+cu126",
+    "cuda_runtime": "12.6",
+    "optimizer_steps": 3,
+    "skipped_optimizer_steps": 0,
+    "gpu_name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+    "memory_ceiling_bytes": 2929406772,
+    "peak_allocated_bytes": 692679168,
+    "peak_reserved_bytes": 738197504,
+    "free_bytes": 2690331444
+  },
+  "hardware_before_model_load": {
+    "timestamp": "2026-11-05T08:54:34.184007Z",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python_version": "3.11.9",
+    "cpu_model": "11th Gen Intel(R) Core(TM) i5-11400H @ 2.70GHz",
+    "logical_cpu_count": 12,
+    "physical_cpu_count": 6,
+    "system_ram_total_bytes": 16952647680,
+    "system_ram_available_bytes": 4199976960,
+    "process_rss_bytes": 753385472,
+    "torch_installed": true,
+    "torch_version": "2.7.0+cu126",
+    "torch_cuda_build_version": "12.6",
+    "cuda_available": true,
+    "driver_gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+        "driver_version": "621.01",
+        "total_bytes": 4294967296,
+        "free_bytes": 3991928832,
+        "used_bytes": 163577856
+      }
+    ],
+    "torch_gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+        "total_bytes": 4294443008,
+        "free_bytes": 3466277684,
+        "allocated_bytes": 0,
+        "reserved_bytes": 0,
+        "peak_allocated_bytes": 0,
+        "peak_reserved_bytes": 0
+      }
+    ],
+    "diagnostics": [],
+    "measurement_kind": "hardware_snapshot_not_model_benchmark"
+  },
+  "hardware_after_training": {
+    "timestamp": "2026-11-05T08:54:38.954911Z",
+    "platform": "Windows-10-10.0.26200-SP0",
+    "python_version": "3.11.9",
+    "cpu_model": "11th Gen Intel(R) Core(TM) i5-11400H @ 2.70GHz",
+    "logical_cpu_count": 12,
+    "physical_cpu_count": 6,
+    "system_ram_total_bytes": 16952647680,
+    "system_ram_available_bytes": 3004149760,
+    "process_rss_bytes": 2005639168,
+    "torch_installed": true,
+    "torch_version": "2.7.0+cu126",
+    "torch_cuda_build_version": "12.6",
+    "cuda_available": true,
+    "driver_gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+        "driver_version": "621.01",
+        "total_bytes": 4294967296,
+        "free_bytes": 3219128320,
+        "used_bytes": 936378368
+      }
+    ],
+    "torch_gpus": [
+      {
+        "index": 0,
+        "name": "NVIDIA GeForce RTX 3050 Laptop GPU",
+        "total_bytes": 4294443008,
+        "free_bytes": 2690331444,
+        "allocated_bytes": 593868800,
+        "reserved_bytes": 738197504,
+        "peak_allocated_bytes": 692679168,
+        "peak_reserved_bytes": 738197504
+      }
+    ],
+    "diagnostics": [],
+    "measurement_kind": "hardware_snapshot_not_model_benchmark"
+  },
+  "resource_versions": {
+    "torch": "2.7.0+cu126",
+    "transformers": "4.51.3",
+    "peft": "0.15.2",
+    "numpy": "1.26.4",
+    "spacy": "3.7.5"
+  },
+  "batch_documents": 1,
+  "token_window_length": 512,
+  "nonpadding_tokens": 19,
+  "sentence_count": 2,
+  "max_windows": 1,
+  "gradient_checkpointing": "non_reentrant",
+  "feature_profile": "light_v1",
+  "lora_rank": 8,
+  "steps": 3,
+  "synthetic_losses": [
+    1.4921875,
+    1.255859375,
+    1.052734375
+  ],
+  "step_seconds_including_synchronization": [
+    0.9023141000006945,
+    0.26116970000020956,
+    0.1309930000006716
+  ],
+  "trainable_parameters": 383876,
+  "changed_trainable_tensors": 34,
+  "merged_fp32_cpu_forward_finite": true,
+  "merge_max_abs_logit_difference": 1.1920928955078125e-07,
+  "checkpoint_exported": false
+}

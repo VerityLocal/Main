@@ -1,0 +1,9 @@
+schema_version: "1.0.0"
+seed: 42
+splits: [train, validation, calibration, final_test]
+leakage_groups: [author, document, source, near_duplicate]
+ai_metrics: [precision, recall, macro_f1, roc_auc, tpr_at_fpr, calibration_error]
+similarity_metrics: [recall_at_k, precision, recall, f1, character_span_pr, source_alignment]
+claim_metrics: [extraction_span_pr, candidate_recall, nli_macro_f1, four_state_macro_f1]
+benchmark_requires_hardware_metadata: true
+benchmark_results_available: false

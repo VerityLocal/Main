@@ -1,0 +1,14 @@
+{
+  "name": "verity-browser-product",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "description": "Active PDF and website analysis using our in-house detection engine.",
+  "scripts": {
+    "build": "node product/build.mjs",
+    "build:installer": "node product/build-installer.mjs",
+    "build:installer:windows": "node product/build-installer-windows.mjs",
+    "test": "node --test product/tests/*.test.js",
+    "demo": "node internal/demo/browser.mjs"
+  }
+}

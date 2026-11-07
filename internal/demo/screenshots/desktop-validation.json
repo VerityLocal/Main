@@ -1,0 +1,18 @@
+{
+  "installed_standalone_runtime": "passed",
+  "actual_mv3_native_messaging": "passed; no native API shim",
+  "automatic_pairing": "passed; no token entry",
+  "helper_startup": "passed",
+  "pdf_extraction": "passed with installed runtime",
+  "offline_scan": "passed; AI unavailable, sources not checked",
+  "repeat_bootstrap_preserves_token": "passed",
+  "helper_restart": "passed automatically before read",
+  "restart_on_panel_reopen": "passed with saved pairing; no Connect click",
+  "test_only_substitutions": [
+    "sandbox HOME/profile; installed native manifest copied to explicit user-data-dir",
+    "side-panel active-tab semantics",
+    "loopback document permission pregrant"
+  ],
+  "screenshot": "/Users/bhumit/Desktop/Web Extension/local-ai-analysis-platform/internal/demo/screenshots/automatic-companion.png",
+  "cleanup": "passed; sandbox helper and browser stopped"
+}

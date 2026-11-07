@@ -1,0 +1,22 @@
+Verity review
+Visible website acceptance fixture
+
+AI-written % is a word-weighted estimate over scored text, not proof of authorship.
+Plagiarism % is source-similarity evidence over checked text, not proof of misconduct.
+Unchecked text is never counted as original. Citations and quotations require human review.
+
+AI-written estimate (scored text): Unavailable
+Source similarity (checked text): Unavailable
+AI coverage: 0%; source search coverage: 0%
+
+Visible website notes
+AI: Unavailable (insufficient_text), confidence Unavailable; source similarity: Unavailable (not_checked)
+
+
+A fox 🦊 crossed our garden this morning, leaving a row of tiny paw prints beside the new seedlings.
+AI: Unavailable (unavailable), confidence Unavailable; source similarity: Unavailable (not_checked)
+
+
+Literal document markup: <script>not executable</script>.
+AI: Unavailable (insufficient_text), confidence Unavailable; source similarity: Unavailable (not_checked)
+

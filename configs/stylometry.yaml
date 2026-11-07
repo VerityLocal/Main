@@ -1,0 +1,11 @@
+schema_version: "1.0.0"
+feature_count: 24
+profile: light_v1
+mattr_window: 50
+richness_min_words: 50
+pos_min_transitions_per_group: 2
+reference_features_enabled: false
+reference_context_tokens: 512
+normalization: training_valid_zscore
+invalid_json_value: null
+implementation_status: implemented_uncalibrated

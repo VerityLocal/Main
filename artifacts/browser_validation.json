@@ -1,0 +1,31 @@
+{
+  "browser": "156.0.8078.80",
+  "platform": "win32",
+  "cases": [
+    {
+      "name": "static DOM range geometry, Unicode, and non-destructive highlights",
+      "passed": true
+    },
+    {
+      "name": "text control mirror geometry, scroll, selection and mutation",
+      "passed": true
+    },
+    {
+      "name": "rendered editor-shaped fixtures retain DOM and invalidate mutations",
+      "passed": true
+    },
+    {
+      "name": "content-script snapshot rejects stale highlights after mutation",
+      "passed": true
+    },
+    {
+      "name": "panel preview loads, counts Unicode and prevents empty submission",
+      "passed": true
+    },
+    {
+      "name": "panel synthetic transport streams results and invalidates manual edits",
+      "passed": true
+    }
+  ],
+  "limitations": "Rendered fixture tests only; not editor framework integration, real MV3 installation, or accuracy evaluation."
+}

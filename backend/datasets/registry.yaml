@@ -1,0 +1,38 @@
+schema_version: "1.0.0"
+datasets:
+  - name: llmtrace_detection_english_pilot
+    version: "pilot_v1@332053804f8798177ff2ecb1148e1839ed429ba3"
+    source: https://huggingface.co/datasets/iitolstykh/LLMTrace_detection
+    license: apache-2.0
+    license_scope: Dataset-card declaration; original third-party source terms are not replaced.
+    language: en
+    record_count: 7168
+    upstream_english_record_count: 40317
+    label_schema:
+      document_policy: contains_annotated_ai_v1
+      document_labels: {0: human_or_no_annotated_ai, 1: contains_annotated_ai_including_mixed}
+      sentence_labels: {0: no_annotated_overlap, 1: fully_covered_nonwhitespace_content}
+      partial_sentence_policy: masked
+      offsets: original_half_open_utf16_code_units
+    collection_method: Pinned public release with original human/AI/mixed span annotations.
+    preprocessing:
+      - Verify all three original SHA-256 hashes before reading records.
+      - Retain English and preserve original text exactly.
+      - Group source topics, normalized exact texts, and lexical near-duplicate components before sampling.
+      - Reserve test components; split original validation components between validation and calibration.
+      - Exclude malformed intervals and documents outside the 512-token / 128-sentence pilot profile.
+      - Sample training by source label, domain, generator and length; evaluation sampling is label-independent.
+    grouping_keys: [topic_id, normalized_exact_text, five_word_shingle_jaccard_0_85]
+    checksums:
+      train.jsonl: 1bb15183e4156365cb67c870052730ea3691c30a6a975dfe3e25554688048b84
+      valid.jsonl: 478c91dc43e07024388853e87cddac4e1cf347e3d93f4ade00f3b48c69d66910
+      test.jsonl: 0b879a39d7a1c1147636f87e8f6a626a46c8e5cdf83a85d0c00a636c1c08e97e
+      english_pilot.jsonl: e61b73e851e2a3359ce64955d773c633e7be5ad25b91beb7161dff0613f36b67
+    split_manifest: "%LOCALAPPDATA%/VerityLocal/datasets/llmtrace_detection/pilot_v1/english_pilot.manifest.json"
+    split_counts: {train: 4096, validation: 768, calibration: 768, final_test: 1536}
+    limitations:
+      - Original author/source IDs and individual source-license records are not provided for every text.
+      - Lexical grouping does not identify arbitrary paraphrases below the declared Jaccard threshold.
+      - Generator/domain distribution is not a guarantee of performance on newer models or user writing.
+      - Pilot evaluation is a bounded subset of the original English test partition.
+      - The final-test sample has 592 human documents, insufficient to establish a 0.1-percent false-positive rate.

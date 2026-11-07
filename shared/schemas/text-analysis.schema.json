@@ -1,0 +1,216 @@
+{
+  "$defs": {
+    "AdapterReference": {
+      "additionalProperties": false,
+      "properties": {
+        "locator": {
+          "maxLength": 256,
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "surface": {
+          "enum": [
+            "manual",
+            "static_dom",
+            "prosemirror",
+            "lexical",
+            "quill",
+            "slate",
+            "textarea",
+            "google_docs"
+          ],
+          "title": "Surface",
+          "type": "string"
+        }
+      },
+      "required": [
+        "surface",
+        "locator"
+      ],
+      "title": "AdapterReference",
+      "type": "object"
+    },
+    "ExtractedBlock": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_ref": {
+          "$ref": "#/$defs/AdapterReference"
+        },
+        "block_id": {
+          "title": "Block Id",
+          "type": "string"
+        },
+        "end_offset": {
+          "exclusiveMinimum": 0,
+          "title": "End Offset",
+          "type": "integer"
+        },
+        "original_text": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "title": "Original Text",
+          "type": "string"
+        },
+        "start_offset": {
+          "minimum": 0,
+          "title": "Start Offset",
+          "type": "integer"
+        },
+        "text_revision": {
+          "minimum": 0,
+          "title": "Text Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "block_id",
+        "original_text",
+        "start_offset",
+        "end_offset",
+        "adapter_ref",
+        "text_revision"
+      ],
+      "title": "ExtractedBlock",
+      "type": "object"
+    },
+    "ExtractedDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "blocks": {
+          "items": {
+            "$ref": "#/$defs/ExtractedBlock"
+          },
+          "maxItems": 2048,
+          "minItems": 1,
+          "title": "Blocks",
+          "type": "array"
+        },
+        "document_id": {
+          "title": "Document Id",
+          "type": "string"
+        },
+        "extracted_text": {
+          "maxLength": 20000,
+          "minLength": 1,
+          "title": "Extracted Text",
+          "type": "string"
+        },
+        "extraction_metadata": {
+          "$ref": "#/$defs/ExtractionMetadata"
+        },
+        "language": {
+          "title": "Language",
+          "type": "string"
+        },
+        "offset_unit": {
+          "const": "utf16_code_unit",
+          "title": "Offset Unit",
+          "type": "string"
+        },
+        "revision": {
+          "title": "Revision",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "document_id",
+        "revision",
+        "language",
+        "blocks",
+        "extracted_text",
+        "offset_unit",
+        "extraction_metadata"
+      ],
+      "title": "ExtractedDocument",
+      "type": "object"
+    },
+    "ExtractionMetadata": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_version": {
+          "maxLength": 64,
+          "minLength": 1,
+          "title": "Adapter Version",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "full_document",
+            "rendered_content",
+            "selection",
+            "manual"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "source_url": {
+          "anyOf": [
+            {
+              "maxLength": 2048,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Url"
+        },
+        "surface": {
+          "enum": [
+            "manual",
+            "static_dom",
+            "prosemirror",
+            "lexical",
+            "quill",
+            "slate",
+            "textarea",
+            "google_docs"
+          ],
+          "title": "Surface",
+          "type": "string"
+        }
+      },
+      "required": [
+        "surface",
+        "scope",
+        "adapter_version"
+      ],
+      "title": "ExtractionMetadata",
+      "type": "object"
+    }
+  },
+  "$id": "urn:local-ai-analysis-platform:1.0.0:text-analysis.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "engines": {
+      "items": {
+        "enum": [
+          "ai_detection",
+          "plagiarism",
+          "claim_verification"
+        ],
+        "type": "string"
+      },
+      "title": "Engines",
+      "type": "array"
+    },
+    "external_search_consent": {
+      "default": false,
+      "title": "External Search Consent",
+      "type": "boolean"
+    },
+    "extraction": {
+      "$ref": "#/$defs/ExtractedDocument"
+    }
+  },
+  "required": [
+    "extraction",
+    "engines"
+  ],
+  "title": "TextAnalysisRequest",
+  "type": "object",
+  "x-contract-version": "1.0.0"
+}

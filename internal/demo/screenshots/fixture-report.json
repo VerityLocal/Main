@@ -1,0 +1,145 @@
+{
+  "product": "Verity",
+  "scanned_at": "2026-11-07T17:46:21.643Z",
+  "document": {
+    "tabId": 1128341927,
+    "tabURL": "http://127.0.0.1:8765/embedded.html",
+    "title": "Embedded PDF acceptance fixture",
+    "sourceURL": "http://127.0.0.1:8765/pdfs/source-overlap.pdf",
+    "kind": "pdf"
+  },
+  "schema_version": 1,
+  "document_digest": "165abe1b9c9b7b46b41f39dc13a684867f5fc2db07046844908f016702e443d6",
+  "text": "Rain garden report\n\nA rain garden is a shallow planted area that collects water from roofs and paved surfaces. Its soil and vegetation help water soak into the ground instead of rushing into storm drains.\n\nI planted three shrubs beside the old shed last April. The smallest one survived because my neighbor watered it whenever I was away, and the bare patch has finally turned green.",
+  "segments": [
+    {
+      "id": "s0",
+      "start": 0,
+      "end": 18,
+      "text": "Rain garden report",
+      "kind": "text",
+      "words": 3,
+      "ai": {
+        "status": "insufficient_text",
+        "score": null,
+        "confidence": null
+      },
+      "plagiarism": {
+        "status": "insufficient_text",
+        "score": null,
+        "confidence": null,
+        "match": null
+      }
+    },
+    {
+      "id": "s1",
+      "start": 20,
+      "end": 110,
+      "text": "A rain garden is a shallow planted area that collects water from roofs and paved surfaces.",
+      "kind": "text",
+      "words": 16,
+      "ai": {
+        "status": "unavailable",
+        "score": null,
+        "confidence": null
+      },
+      "plagiarism": {
+        "status": "checked",
+        "score": 1,
+        "confidence": null,
+        "match": {
+          "url": "https://example.org/rain-garden-demo",
+          "title": "Controlled demo reference",
+          "excerpt": "A rain garden is a shallow planted area that collects water from roofs and paved surfaces. Its soil and vegetation help water soak into the ground instead of rushing into storm drains.",
+          "similarity": 1,
+          "confidence": null
+        }
+      }
+    },
+    {
+      "id": "s2",
+      "start": 111,
+      "end": 204,
+      "text": "Its soil and vegetation help water soak into the ground instead of rushing into storm drains.",
+      "kind": "text",
+      "words": 16,
+      "ai": {
+        "status": "unavailable",
+        "score": null,
+        "confidence": null
+      },
+      "plagiarism": {
+        "status": "checked",
+        "score": 1,
+        "confidence": null,
+        "match": {
+          "url": "https://example.org/rain-garden-demo",
+          "title": "Controlled demo reference",
+          "excerpt": "Its soil and vegetation help water soak into the ground instead of rushing into storm drains.",
+          "similarity": 1,
+          "confidence": null
+        }
+      }
+    },
+    {
+      "id": "s3",
+      "start": 206,
+      "end": 260,
+      "text": "I planted three shrubs beside the old shed last April.",
+      "kind": "text",
+      "words": 10,
+      "ai": {
+        "status": "insufficient_text",
+        "score": null,
+        "confidence": null
+      },
+      "plagiarism": {
+        "status": "insufficient_text",
+        "score": null,
+        "confidence": null,
+        "match": null
+      }
+    },
+    {
+      "id": "s4",
+      "start": 261,
+      "end": 383,
+      "text": "The smallest one survived because my neighbor watered it whenever I was away, and the bare patch has finally turned green.",
+      "kind": "text",
+      "words": 21,
+      "ai": {
+        "status": "unavailable",
+        "score": null,
+        "confidence": null
+      },
+      "plagiarism": {
+        "status": "checked",
+        "score": 0,
+        "confidence": null,
+        "match": null
+      }
+    }
+  ],
+  "overall": {
+    "ai": {
+      "percent": null,
+      "coverage": 0,
+      "scored_segments": 0,
+      "total_segments": 5,
+      "status": "unavailable"
+    },
+    "plagiarism": {
+      "percent": 60.37735849056604,
+      "coverage": 0.803030303030303,
+      "scored_segments": 3,
+      "total_segments": 5,
+      "search_coverage": 0.803030303030303,
+      "status": "partial"
+    }
+  },
+  "notes": [
+    "AI-written % is a word-weighted estimate over scored text, not proof of authorship.",
+    "Plagiarism % is source-similarity evidence over checked text, not proof of misconduct.",
+    "Unchecked text is never counted as original. Citations and quotations require human review."
+  ]
+}

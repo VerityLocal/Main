@@ -1,0 +1,144 @@
+{
+  "$id": "urn:local-ai-analysis-platform:1.0.0:finding.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "calibration_artifact_id": {
+      "anyOf": [
+        {
+          "maxLength": 128,
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Calibration Artifact Id"
+    },
+    "category": {
+      "enum": [
+        "AI_GENERATED_CANDIDATE",
+        "EXACT_OVERLAP",
+        "REORDERED_TEXT",
+        "SEMANTIC_PARAPHRASE",
+        "SUPPORTED",
+        "CONTRADICTED",
+        "INSUFFICIENT_EVIDENCE",
+        "CONFLICTING_EVIDENCE",
+        "INTRINSIC_CONTRADICTION_CANDIDATE"
+      ],
+      "title": "Category",
+      "type": "string"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Confidence"
+    },
+    "confidence_interpretation": {
+      "default": "not_available",
+      "enum": [
+        "not_available",
+        "probability_calibrated"
+      ],
+      "title": "Confidence Interpretation",
+      "type": "string"
+    },
+    "contract_version": {
+      "const": "1.0.0",
+      "default": "1.0.0",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "diagnostics": {
+      "additionalProperties": {
+        "anyOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "number"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "boolean"
+          },
+          {
+            "type": "null"
+          }
+        ]
+      },
+      "title": "Diagnostics",
+      "type": "object"
+    },
+    "document_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Document Id",
+      "type": "string"
+    },
+    "end_offset": {
+      "exclusiveMinimum": 0,
+      "title": "End Offset",
+      "type": "integer"
+    },
+    "finding_id": {
+      "maxLength": 128,
+      "minLength": 1,
+      "title": "Finding Id",
+      "type": "string"
+    },
+    "offset_unit": {
+      "const": "utf16_code_unit",
+      "default": "utf16_code_unit",
+      "title": "Offset Unit",
+      "type": "string"
+    },
+    "revision": {
+      "minimum": 0,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "score": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Score"
+    },
+    "start_offset": {
+      "minimum": 0,
+      "title": "Start Offset",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "finding_id",
+    "document_id",
+    "revision",
+    "start_offset",
+    "end_offset",
+    "category"
+  ],
+  "title": "Finding",
+  "type": "object",
+  "x-contract-version": "1.0.0"
+}

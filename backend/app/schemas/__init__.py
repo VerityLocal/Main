@@ -1,0 +1,1 @@
+"""Strict, immutable shared contracts."""

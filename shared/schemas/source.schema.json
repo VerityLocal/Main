@@ -1,0 +1,80 @@
+{
+  "$id": "urn:local-ai-analysis-platform:1.0.0:source.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "publication_date": {
+      "anyOf": [
+        {
+          "maxLength": 32,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Publication Date"
+    },
+    "reliability": {
+      "default": "unrated",
+      "enum": [
+        "unrated",
+        "user_trusted"
+      ],
+      "title": "Reliability",
+      "type": "string"
+    },
+    "retrieved_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Retrieved At"
+    },
+    "source_id": {
+      "pattern": "^[A-Za-z0-9_.:-]{1,128}$",
+      "title": "Source Id",
+      "type": "string"
+    },
+    "text": {
+      "maxLength": 100000,
+      "minLength": 1,
+      "title": "Text",
+      "type": "string"
+    },
+    "title": {
+      "maxLength": 256,
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "url": {
+      "anyOf": [
+        {
+          "maxLength": 2048,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Url"
+    }
+  },
+  "required": [
+    "source_id",
+    "title",
+    "text"
+  ],
+  "title": "Source",
+  "type": "object",
+  "x-contract-version": "1.0.0"
+}

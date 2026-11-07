@@ -1,0 +1,14 @@
+{
+  "artifact": "product/dist/installer/windows/VeritySetup.exe",
+  "architecture": "AMD64 PE32+",
+  "subsystem": "Windows GUI",
+  "requested_privilege": "asInvoker; no administrator request",
+  "payload": "passed; exact first-party source hashes and retained compiler license",
+  "download_archive": "passed; exact executable, checksum, instructions and notices",
+  "sha256": "1bca14ae0eea6c424b40691a5c1a0fcd4bc2c62539ce91c8f9f4b34793523fca",
+  "authenticode_certificate_present": false,
+  "validation_host": "darwin",
+  "windows_installation_execution": "not tested; Windows acceptance machine required",
+  "windows_native_browser_integration": "not tested; registry unit tests use an explicit fake",
+  "ai": "unavailable; no models or approved calibration added"
+}
