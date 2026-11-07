@@ -5,6 +5,7 @@ from pathlib import Path
 
 from product.engine.local_os import bootstrap_lock, reject_link
 from product.engine.native_host import initialize_config, save_config
+from product.engine.model_setup import apply_profile
 
 HOST = "local.verity.helper"
 REGISTRY_BASES = [
@@ -64,7 +65,11 @@ def register(root, install_root, registry=None):
                     validate_existing(original, install_root)
                 changes.append((key, view, original, str(paths["firefox" if "Mozilla" in base else "chrome"])))
         # Validate every collision before pairing or changing any registration.
-        initialize_config(install_root / "helper.json", release["chrome_origin"])
+        value = initialize_config(install_root / "helper.json", release["chrome_origin"])
+        profile = install_root / "models-profile.json"
+        reject_link(profile)
+        if profile.exists():
+            save_config(install_root / "helper.json", apply_profile(value, json.loads(profile.read_text())))
         save_config(paths["chrome"], chrome)
         save_config(paths["firefox"], firefox)
         written = []

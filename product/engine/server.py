@@ -18,10 +18,12 @@ from pathlib import Path
 os.environ["HF_HUB_OFFLINE"] = "1"
 os.environ["TRANSFORMERS_OFFLINE"] = "1"
 os.environ["HF_HUB_DISABLE_TELEMETRY"] = "1"
+os.environ["TOKENIZERS_PARALLELISM"] = "false"
 logging.disable(logging.CRITICAL)
 
 from .detection import Cancelled, DetectionEngine
 from .pdf import MAX_PDF_BYTES, extract_pdf
+from .resources import model_setup_states
 
 DEFAULT_CONFIG = Path(__file__).parents[1] / ".local/helper.json"
 ORIGIN = re.compile(r"(?:chrome-extension://[a-p]{32}|moz-extension://[a-zA-Z0-9-]{20,80})$")
@@ -54,12 +56,13 @@ class BoundedServer(ThreadingHTTPServer):
 
     def service_actions(self):
         self.jobs.expire()
-        if self.idle_seconds and time.monotonic() - self.last_activity > self.idle_seconds and not self.stopping:
-            with self.jobs.lock:
-                busy = any(row["state"] in {"queued", "running"} for row in self.jobs.rows.values())
-            if not busy:
-                self.stopping = True
-                threading.Thread(target=self.shutdown, daemon=True).start()
+        with self.activity_lock:
+            if self.idle_seconds and time.monotonic() - self.last_activity > self.idle_seconds and not self.stopping:
+                with self.jobs.lock:
+                    busy = self.active_operations or any(row["state"] in {"queued", "running"} for row in self.jobs.rows.values())
+                if not busy:
+                    self.stopping = True
+                    threading.Thread(target=self.shutdown, daemon=True).start()
 
 
 class Jobs:
@@ -203,7 +206,8 @@ def make_server(config, port=8790, engine=None):
             if not self.boundary():
                 return
             if self.path == "/health":
-                self.reply(200, {"ready": True, "offline_ai": True, "version": "0.2.0", "installation_id": config.get("installation_id")})
+                states = model_setup_states(config)
+                self.reply(200, {"ready": True, "offline_ai": True, "version": "0.2.0", "installation_id": config.get("installation_id"), "model_setup": states, "calibration": "required"})
             elif re.fullmatch(r"/jobs/[a-f0-9]{32}", self.path):
                 result = jobs.get(self.path.rsplit("/", 1)[1])
                 self.reply(200, result) if result else self.error(404, "This scan is no longer available")
@@ -216,6 +220,8 @@ def make_server(config, port=8790, engine=None):
             if not slots.acquire(blocking=False):
                 self.error(429, "The local helper is busy")
                 return
+            with self.server.activity_lock:
+                self.server.active_operations += 1
             try:
                 if self.headers.get("Transfer-Encoding") or self.headers.get("Content-Type", "").split(";")[0] != "application/json":
                     self.error(415, "Unsupported request format")
@@ -274,11 +280,16 @@ def make_server(config, port=8790, engine=None):
             except Exception:
                 self.error(503, "The local operation is unavailable. Review your helper setup")
             finally:
+                with self.server.activity_lock:
+                    self.server.active_operations -= 1
+                    self.server.last_activity = time.monotonic()
                 slots.release()
 
     server = BoundedServer(("127.0.0.1", port), Handler)
     server.daemon_threads = True
     server.jobs = jobs
+    server.activity_lock = threading.Lock()
+    server.active_operations = 0
     server.last_activity = time.monotonic()
     server.idle_seconds = max(0, min(86400, int(config.get("idle_seconds", 0))))
     server.stopping = False

@@ -100,7 +100,7 @@ func installWindow(options installOptions) (string, error) {
 	statusLabel, _, _ = user32.NewProc("CreateWindowExW").Call(0, uintptr(unsafe.Pointer(utf16("STATIC"))), uintptr(unsafe.Pointer(utf16("Preparing your local desktop companion…"))), 0x50000000, 20, 25, 495, 95, window, 0, instance, 0)
 	font, _, _ := syscall.NewLazyDLL("gdi32.dll").NewProc("GetStockObject").Call(17)
 	user32.NewProc("SendMessageW").Call(statusLabel, 0x0030, font, 1)
-	ctx, cancel := context.WithTimeout(context.Background(), 40*time.Minute)
+	ctx, cancel := context.WithTimeout(context.Background(), 120*time.Minute)
 	defer cancel()
 	cancelInstall = cancel
 	options.Progress = setStatus
@@ -138,12 +138,12 @@ func main() {
 	closeMutex, err := installerMutex(root)
 	if err != nil { fail(err.Error()); os.Exit(1) }
 	defer closeMutex()
-	if !headless && message("Install Verity's local desktop companion? This downloads its runtime once, requires no administrator password, and does not upload documents or download AI model weights.", 0x24) != 6 { return }
+	if !headless && message("Install Verity's local companion? Setup downloads its runtime, browser and about 1.9 GB of reviewed prose/semantic models. Binoculars adds about 29 GB only on machines with at least 64 GB RAM. Code models require a permitted checkpoint/reference corpus. Authorship stays local; AI percentages require independent calibration. No administrator password is needed.", 0x24) != 6 { return }
 	options := installOptions{Root: root, Executable: executable, Payload: payload, PrivateDirectory: privateDirectory, Run: runHidden}
 	var folder string
 	if headless {
 		options.Progress = func(value string) { os.Stdout.WriteString(value+"\n") }
-		ctx, cancel := context.WithTimeout(context.Background(), 40*time.Minute)
+		ctx, cancel := context.WithTimeout(context.Background(), 120*time.Minute)
 		defer cancel()
 		folder, err = install(ctx, options)
 	} else { folder, err = installWindow(options) }
@@ -154,5 +154,5 @@ func main() {
 	}
 	if headless { os.Stdout.WriteString("Desktop companion installed. Extension folder: "+folder+"\n"); return }
 	openFolder(folder)
-	message("Verity is installed. Load the chrome-extension folder shown in Explorer into Chrome or Edge. The extension pairs, starts and restarts its companion automatically—no terminal or token setup. AI estimates remain unavailable until approved models are provisioned.", 0x40)
+	message("Verity is installed. Load the chrome-extension folder shown in Explorer into Chrome or Edge. Pairing and companion startup are automatic. Reviewed models were provisioned where hardware permits; code assets may still be missing. AI percentages remain unavailable until independently calibrated.", 0x40)
 }

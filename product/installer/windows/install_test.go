@@ -132,17 +132,19 @@ func TestInstallPromotesRuntimeAndUsesOnlyFixedProvisioningCommands(t *testing.T
 	}
 	folder, err := install(context.Background(), options)
 	if err != nil { t.Fatal(err) }
-	if len(commands) != 4 { t.Fatalf("unexpected command count: %d", len(commands)) }
+	if len(commands) != 6 { t.Fatalf("unexpected command count: %d", len(commands)) }
 	if strings.Join(commands[0][:6], " ") != "-I -m pip --isolated install --only-binary=:all:" { t.Fatal("unexpected dependency installation") }
 	if strings.Join(commands[1], " ") != "-I -m playwright install chromium --only-shell" { t.Fatal("unexpected browser installation") }
-	if !strings.HasSuffix(commands[3][1], "provision_windows_entry.py") || commands[3][4] != "--install-root" { t.Fatal("unexpected provisioning command") }
+	if !strings.HasSuffix(commands[3][len(commands[3])-1], "model-requirements.txt") { t.Fatal("missing model dependencies") }
+	if !strings.HasSuffix(commands[4][1], "model_entry.py") || commands[4][2] != "--root" || commands[4][3] != options.Root || commands[4][4] != "--pins" { t.Fatal("unexpected model setup command") }
+	if !strings.HasSuffix(commands[5][1], "provision_windows_entry.py") || commands[5][4] != "--install-root" { t.Fatal("unexpected provisioning command") }
 	root := filepath.Dir(folder)
 	if filepath.Dir(root) != filepath.Join(options.Root, "versions") { t.Fatal("runtime was not promoted") }
 	if _, err := os.Stat(filepath.Join(root, "native-host.exe")); err != nil { t.Fatal(err) }
 }
 
 func TestFailedInstallKeepsUserSettingsAndOnlyCleansItsStage(t *testing.T) {
-	for _, failCommand := range []int{1, 4} {
+	for _, failCommand := range []int{1, 4, 5, 6} {
 		t.Run(string(rune('0'+failCommand)), func(t *testing.T) {
 			options := stagedInstallFixture(t)
 			os.MkdirAll(options.Root, 0700)
@@ -160,8 +162,8 @@ func TestFailedInstallKeepsUserSettingsAndOnlyCleansItsStage(t *testing.T) {
 			entries, _ := os.ReadDir(options.Root)
 			for _, entry := range entries { if strings.HasPrefix(entry.Name(), ".install-") { t.Fatal("staging directory leaked") } }
 			versions, _ := os.ReadDir(filepath.Join(options.Root, "versions"))
-			if failCommand == 4 && len(versions) != 1 { t.Fatal("promoted release was improperly discarded") }
-			if failCommand == 1 && len(versions) != 0 { t.Fatal("failed stage was promoted") }
+			if failCommand == 6 && len(versions) != 1 { t.Fatal("promoted release was improperly discarded") }
+			if failCommand < 6 && len(versions) != 0 { t.Fatal("failed stage was promoted") }
 		})
 	}
 }

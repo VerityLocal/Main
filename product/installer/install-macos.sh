@@ -42,7 +42,7 @@ trap finish EXIT
 
 if ! $HEADLESS; then
   if ! /usr/bin/osascript <<'APPLESCRIPT'
-display dialog "Install Verity's local desktop companion? This downloads its runtime and browser components once. It runs locally, requires no administrator password, and does not install AI model weights or upload documents." with title "Verity Installer" buttons {"Cancel", "Install"} default button "Install"
+display dialog "Install Verity's local desktop companion? Setup downloads its runtime, browser, and about 1.9 GB of reviewed prose/semantic models on supported machines. Binoculars adds about 29 GB only on machines with at least 64 GB RAM. Code models require a permitted trained checkpoint/reference corpus. Documents stay local for authorship; no administrator password is needed. AI percentages still require independent calibration." with title "Verity Installer" buttons {"Cancel", "Install"} default button "Install"
 APPLESCRIPT
   then
     trap - EXIT
@@ -75,10 +75,14 @@ ACTUAL=$(/usr/bin/shasum -a 256 "$STAGE/python.tar.gz")
 /bin/cp -R "$RESOURCES/payload/." "$STAGE/"
 
 PHASE="Installing local components"
-say "$PHASE. No model weights are being downloaded."
+say "$PHASE. Downloaded dependencies retain their own licenses."
 "$STAGE/python/bin/python3" -I -m pip --isolated install --only-binary=:all: --disable-pip-version-check --index-url https://pypi.org/simple --cache-dir "$INSTALL_ROOT/download-cache" -r "$STAGE/runtime-requirements.txt"
 PLAYWRIGHT_BROWSERS_PATH="$STAGE/browsers" "$STAGE/python/bin/python3" -I -m playwright install chromium --only-shell
 "$STAGE/python/bin/python3" -I -c 'from docling_parse.pdf_parser import DoclingPdfParser; from playwright.async_api import async_playwright; print("Local components verified.")'
+"$STAGE/python/bin/python3" -I -m pip --isolated install --only-binary=:all: --disable-pip-version-check --index-url https://pypi.org/simple --cache-dir "$INSTALL_ROOT/download-cache" -r "$STAGE/model-requirements.txt"
+PHASE="Downloading and verifying reviewed local models"
+say "$PHASE. Large models are skipped if this machine has insufficient RAM."
+"$STAGE/python/bin/python3" -I "$STAGE/model_entry.py" --root "$INSTALL_ROOT" --pins "$STAGE/model-pins.json"
 
 # Promote a new immutable release; never replace an active runtime or user settings.
 RELEASE="$INSTALL_ROOT/versions/$(/bin/date +%Y%m%d%H%M%S)-${STAGE:t}"
@@ -90,7 +94,7 @@ PHASE="Connecting your browsers"
 if ! $HEADLESS; then
   /usr/bin/open -R "$RELEASE/chrome-extension"
   /usr/bin/osascript <<'APPLESCRIPT'
-display dialog "Verity is installed. Load the chrome-extension folder shown in Finder into Chrome or Edge. Once loaded, the extension connects, pairs, and starts its local companion automatically—no terminal or token setup. AI estimates remain unavailable until approved models are provisioned." with title "Verity Installer" buttons {"Done"} default button "Done"
+display dialog "Verity is installed. Load the chrome-extension folder shown in Finder into Chrome or Edge. Pairing and companion startup are automatic—no terminal or token setup. Reviewed local models were provisioned where hardware permits. Code assets may still be missing; AI percentages remain unavailable until independently calibrated." with title "Verity Installer" buttons {"Done"} default button "Done"
 APPLESCRIPT
 fi
 print "Verity desktop companion installation complete."

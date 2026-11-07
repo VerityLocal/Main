@@ -2,6 +2,7 @@
 from difflib import SequenceMatcher
 
 from .assets import fingerprint, verify_assets
+from .resources import require_memory
 from .text import segment, words
 
 
@@ -26,6 +27,7 @@ class Semantic:
             return None
 
         if self.model is None:
+            require_memory(max(4, self.config.get("min_ram_gib", 4)), 0.5)
             verify_assets(self.config, ("path",))
             from sentence_transformers import SentenceTransformer
             self.model = SentenceTransformer(self.config["path"], local_files_only=True, trust_remote_code=False, device="cpu")

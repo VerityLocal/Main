@@ -21,6 +21,13 @@ reviewed licenses, exact snapshots and a SHA-256-pinned complete file manifest.
 Changed, missing, extra or linked assets cause abstention. This protects drift, not
 a hostile local user able to rewrite configuration and assets together.
 
+Approved setup contacts Hugging Face and its reviewed HTTPS download hosts for
+immutable, byte-count/SHA-256-pinned snapshots. This is separate from document
+analysis and transmits no document text. Installers also contact Python package,
+runtime and browser distribution hosts. Initial setup can use substantial disk,
+bandwidth and memory; inference checks physical/available RAM before cold model
+loads. Resource gates are not OS-level isolation or a no-OOM guarantee.
+
 Cancellation is cooperative between segments; an executing native parser/model
 operation may finish before cancellation takes effect. OS resource isolation and
 platform/browser security acceptance remain production gates.

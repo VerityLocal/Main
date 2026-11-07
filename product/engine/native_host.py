@@ -71,7 +71,7 @@ def initialize_config(path, origin):
 
 
 def request_helper(token, path="/health", data=None):
-    connection = http.client.HTTPConnection("127.0.0.1", 8790, timeout=2)
+    connection = http.client.HTTPConnection("127.0.0.1", 8790, timeout=30 if path == "/extract" else 2)
     try:
         headers = {"Authorization": "Bearer " + token}
         if data is not None:

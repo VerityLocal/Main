@@ -22,8 +22,11 @@ include the extension; use this ZIP to load or update it separately.
 **Unsigned development builds:** operating systems may warn or block installation.
 Do not disable security protections. Windows installation/browser integration and
 Intel macOS execution are not yet tested. Signed production builds are unavailable.
-AI estimates currently show **Unavailable**; no model weights or approved
-calibration are included. See [release limitations](docs/DISTRIBUTION.md).
+**AI percentages remain Unavailable until independently calibrated.** Setup now
+downloads hash-pinned Desklib and BGE-small models where hardware permits; the
+Binoculars pair is skipped below 64 GiB RAM. GPTSniffer permissions/checkpoint and
+a provenance-backed code corpus remain unresolved. See [model availability](docs/MODELS.md)
+and [release limitations](docs/DISTRIBUTION.md).
 
 1. Extract the ZIP. Open **Verity Installer.app** on macOS or **VeritySetup.exe**
    on Windows and approve installation if permitted by the operating system.
@@ -32,7 +35,10 @@ calibration are included. See [release limitations](docs/DISTRIBUTION.md).
 3. Open a PDF and click the extension. Pairing, runtime setup and helper
    startup/restart are automatic—no terminal, Python setup or pairing token.
 
-First installation needs internet. The helper stops after 30 idle minutes. Linux,
+First installation needs internet and about **1.9 GB of model downloads**, plus
+the runtime/browser and ML dependencies. On 64 GiB+ machines the Falcon pair adds
+about **29 GB**. Provisioned assets are not a guarantee of successful inference or
+accuracy. The helper stops after 30 idle minutes. Linux,
 native Windows ARM64, 32-bit Windows, Safari and mobile are not supported.
 
 ## Build for development
@@ -71,11 +77,12 @@ settings. Enter its private `token` in the extension’s **Settings**. Pair the 
 origin shown under **Advanced development connection** (including the
 browser-generated origin for Firefox). Normal installer users skip these steps.
 
-**Current release limitation:** no production AI model/calibration is provisioned
-by the build command. Until configured, authorship results show **Unavailable**,
-not a fabricated percentage. PDF extraction and web source comparison also require
-the provisioned local runtime. This is a development release, not a validated
-accuracy guarantee or an assertion of completed in-house model fine-tuning.
+Build commands create small bootstrap packages, not bundled model weights.
+Installers acquire the permitted pinned models automatically; manual developers
+use the explicit setup command in [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md).
+Missing assets, unsupported lengths and resource limits abstain. Raw model outputs
+are internal features, never published as calibrated percentages. This is a
+development release, not an accuracy guarantee or in-house fine-tuning claim.
 
 ## Review a document
 

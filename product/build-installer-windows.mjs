@@ -32,7 +32,7 @@ const id = [...hash].map(b => String.fromCharCode(97 + (b >> 4), 97 + (b & 15)))
 const pins = JSON.parse(await readFile(path.join(source, "runtime-pins.json"), "utf8"));
 const pin = pins.windows?.x86_64;
 if (!/^https:\/\/github\.com\/astral-sh\/python-build-standalone\/releases\/download\/[0-9]+\/cpython-[0-9.]+(?:%2B|\+)[0-9]+-x86_64-pc-windows-msvc-install_only\.tar\.gz$/.test(pin?.url || "") || !/^[a-f0-9]{64}$/.test(pin?.sha256 || "")) throw new Error("Invalid Windows runtime pin");
-const engineFiles = ["__init__.py", "ai.py", "assets.py", "calibration.py", "detection.py", "local_os.py", "native_host.py", "pdf.py", "server.py", "similarity.py", "text.py", "web.py"];
+const engineFiles = ["__init__.py", "ai.py", "assets.py", "calibration.py", "detection.py", "local_os.py", "model_setup.py", "native_host.py", "pdf.py", "resources.py", "server.py", "similarity.py", "text.py", "web.py"];
 const extensionFiles = ["background.js", "calibration.json", "capture.js", "connection.js", "content.js", "icon.svg", "manifest.json", "panel.css", "panel.html", "panel.js", "reader.js"];
 // One RT_MANIFEST resource in an AMD64 COFF object. This avoids a Windows SDK
 // build dependency and prevents legacy "Setup.exe" administrator-elevation heuristics.
@@ -83,7 +83,8 @@ try {
   for (const name of engineFiles) await add("product/engine/" + name, path.join(root, "engine", name));
   for (const browser of ["chrome", "firefox"]) for (const name of extensionFiles) await add(browser + "-extension/" + name, path.join(root, "dist", browser, name));
   await add("product/extension/calibration.json", path.join(root, "extension/calibration.json"));
-  for (const name of ["native_entry.py", "provision_windows.py", "provision_windows_entry.py", "runtime-pins.json"]) await add(name, path.join(source, name));
+  for (const name of ["native_entry.py", "model_entry.py", "provision_windows.py", "provision_windows_entry.py", "runtime-pins.json"]) await add(name, path.join(source, name));
+  for (const name of ["model-pins.json", "model-requirements.txt", "THIRD-PARTY-NOTICES.txt"]) await add(name, path.join(root, name));
   await add("runtime-requirements.txt", path.join(root, "runtime-requirements.txt"));
   await add("release.json", null, JSON.stringify({ engine_version: manifest.version, chrome_origin: "chrome-extension://" + id, firefox_id: "verity@local.invalid" }, null, 2) + "\n");
   const license = await readFile(path.join(goRoot, "LICENSE"), "utf8");
@@ -95,8 +96,8 @@ try {
   await writeFile(path.join(stage, "manifest.syso"), manifestObject(await readFile(path.join(source, "windows/app.manifest"))));
   const executable = path.join(stage, "VeritySetup.exe");
   run(["build", "-trimpath", "-ldflags=-H=windowsgui -s -w -buildid=", "-o", executable, "."], stage, { ...nativeEnv, GOOS: "windows", GOARCH: "amd64" });
-  const info = "Double-click VeritySetup.exe and approve Install, then load the chrome-extension folder shown in Explorer into Chrome or Edge. Windows 10/11 x64 is required. Runtime provisioning, pairing and startup are automatic; first installation needs internet. This is an unsigned development build, not a publicly validated release. Public distribution requires Authenticode signing and Windows acceptance testing. Do not disable Windows security. No AI model weights are included.\n";
-  const notices = "The installer/native launcher includes the Go standard library under the following license. Downloaded Python, runtime packages and browser components retain their own license files in the installed runtime.\n\n" + license;
+  const info = "Open VeritySetup.exe if permitted by Windows, approve Install, then load the chrome-extension folder shown in Explorer. Windows 10/11 x64 is required. Setup downloads the runtime, browser and about 1.9 GB of reviewed models; Binoculars adds about 29 GB only on 64 GB+ machines. AI percentages require independent calibration; code assets need a permitted checkpoint/corpus. Pairing and startup are automatic. This is an unsigned development build; Windows execution/browser acceptance and signing are outstanding. Do not disable Windows security.\n";
+  const notices = await readFile(path.join(root, "THIRD-PARTY-NOTICES.txt"), "utf8") + "\nThe installer/native launcher includes the Go standard library under the following license.\n\n" + license;
   await mkdir(output, { recursive: true });
   await copyFile(executable, path.join(output, "VeritySetup.exe"));
   await writeFile(path.join(output, "VeritySetup.exe.sha256"), createHash("sha256").update(await readFile(executable)).digest("hex") + "  VeritySetup.exe\n");

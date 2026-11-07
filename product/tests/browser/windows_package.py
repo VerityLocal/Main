@@ -102,9 +102,9 @@ def main():
             elif name.startswith(("chrome-extension/", "firefox-extension/")):
                 browser, file = name.split("/", 1)
                 source = ROOT / "product/dist" / browser.removesuffix("-extension") / file
-            elif name == "runtime-requirements.txt":
-                source = ROOT / "product/runtime-requirements.txt"
-            elif name in {"native_entry.py", "provision_windows.py", "provision_windows_entry.py", "runtime-pins.json"}:
+            elif name in {"runtime-requirements.txt", "model-pins.json", "model-requirements.txt", "THIRD-PARTY-NOTICES.txt"}:
+                source = ROOT / "product" / name
+            elif name in {"native_entry.py", "model_entry.py", "provision_windows.py", "provision_windows_entry.py", "runtime-pins.json"}:
                 source = ROOT / "product/installer" / name
             elif name == "licenses/go-LICENSE.txt":
                 assert content.decode() in (OUTPUT / "THIRD-PARTY-NOTICES.txt").read_text()
@@ -119,7 +119,7 @@ def main():
             else:
                 raise AssertionError("Unexpected embedded file: " + name)
             assert content == source.read_bytes(), "Stale packaged file: " + name
-    result = {"artifact": "product/dist/installer/windows/VeritySetup.exe", "architecture": "AMD64 PE32+", "subsystem": "Windows GUI", "requested_privilege": "asInvoker; no administrator request", "payload": "passed; exact first-party source hashes and retained compiler license", "download_archive": "passed; exact executable, checksum, instructions and notices", "sha256": digest, "authenticode_certificate_present": signed, "validation_host": sys.platform, "windows_installation_execution": "not tested; Windows acceptance machine required", "windows_native_browser_integration": "not tested; registry unit tests use an explicit fake", "ai": "unavailable; no models or approved calibration added"}
+    result = {"artifact": "product/dist/installer/windows/VeritySetup.exe", "architecture": "AMD64 PE32+", "subsystem": "Windows GUI", "requested_privilege": "asInvoker; no administrator request", "payload": "passed; exact first-party source hashes and retained compiler license", "download_archive": "passed; exact executable, checksum, instructions and notices", "sha256": digest, "authenticode_certificate_present": signed, "validation_host": sys.platform, "windows_installation_execution": "not tested; Windows acceptance machine required", "windows_native_browser_integration": "not tested; registry unit tests use an explicit fake", "ai": "percentages unavailable; automatic permitted model setup is packaged, not executed on Windows"}
     reports = Path(__file__).parent / "screenshots"
     reports.mkdir(exist_ok=True)
     (reports / "windows-package-validation.json").write_text(json.dumps(result, indent=2) + "\n")

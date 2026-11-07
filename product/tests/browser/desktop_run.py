@@ -48,6 +48,7 @@ async def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--install-root", type=Path, required=True)
     parser.add_argument("--browser-home", type=Path, required=True)
+    parser.add_argument("--require-models", action="store_true", help="Require genuine installed prose inference, not only unavailable UI scores")
     args = parser.parse_args()
     make_fixtures()
     install = args.install_root.resolve()
@@ -107,9 +108,25 @@ async def main():
                     await panel.locator("#scan:not([disabled])").wait_for(timeout=20_000)
                     assert SOURCE_TEXT in await panel.locator("#reader").inner_text()
                     await panel.locator("#scan").click()
-                    await panel.locator("#export:not([disabled])").wait_for(timeout=20_000)
+                    await panel.locator("#export:not([disabled])").wait_for(timeout=90_000)
                     assert await panel.locator("#ai-score").inner_text() == "Unavailable"
                     assert await panel.locator("#copy-score").inner_text() == "Not checked"
+                    async with panel.expect_download() as download:
+                        await panel.locator("#export").click()
+                    report_file = screenshots / "installed-report.json"
+                    await (await download.value).save_as(report_file)
+                    report = json.loads(report_file.read_text())
+                    assert report["segments"] and report["overall"]["ai"]["percent"] is None
+                    assert all(row["ai"]["score"] is None and row["ai"]["confidence"] is None for row in report["segments"])
+                    model_inference = "not required; unavailable percentages verified"
+                    if args.require_models:
+                        eligible = [row for row in report["segments"] if row["kind"] == "text" and row["words"] >= 12]
+                        assert eligible and all(row["ai"]["status"] == "calibration_required" for row in eligible), [row["ai"]["status"] for row in eligible]
+                        assert all(row["ai"]["status"] == "insufficient_text" for row in report["segments"] if row["words"] < 12)
+                        setup_status = await panel.locator("#model-status").inner_text()
+                        for label in ["Prose classifier: setup complete", "Semantic similarity: setup complete", "Code classifier: trained checkpoint required", "Code reference matches: reference corpus required"]:
+                            assert label in setup_status, setup_status
+                        model_inference = "passed; all eligible exported prose segments require calibration after genuine inference; short segments abstain"
                     repeat = await panel.evaluate("""async () => {
                       const origin = chrome.runtime.getURL('').replace(/\/$/, '');
                       const stored = (await chrome.storage.local.get('pairingToken')).pairingToken;
@@ -130,7 +147,7 @@ async def main():
                     assert await panel.locator("#advanced").get_attribute("open") is None
                     assert not errors, errors
                     print("Automatic restart before read and on panel reopen passed.", flush=True)
-                    result = {"installed_standalone_runtime": "passed", "actual_mv3_native_messaging": "passed; no native API shim", "automatic_pairing": "passed; no token entry", "helper_startup": "passed", "pdf_extraction": "passed with installed runtime", "offline_scan": "passed; AI unavailable, sources not checked", "repeat_bootstrap_preserves_token": "passed", "helper_restart": "passed automatically before read", "restart_on_panel_reopen": "passed with saved pairing; no Connect click", "test_only_substitutions": ["sandbox HOME/profile; installed native manifest copied to explicit user-data-dir", "side-panel active-tab semantics", "loopback document permission pregrant"], "screenshot": str(screenshots / "automatic-companion.png")}
+                    result = {"installed_standalone_runtime": "passed", "actual_mv3_native_messaging": "passed; no native API shim", "automatic_pairing": "passed; no token entry", "helper_startup": "passed", "pdf_extraction": "passed with installed runtime", "offline_scan": "passed; AI unavailable, sources not checked", "json_export": "passed; unavailable percentage, scores and confidence verified", "installed_model_inference": model_inference, "repeat_bootstrap_preserves_token": "passed", "helper_restart": "passed automatically before read", "restart_on_panel_reopen": "passed with saved pairing; no Connect click", "test_only_substitutions": ["sandbox HOME/profile; installed native manifest copied to explicit user-data-dir", "side-panel active-tab semantics", "loopback document permission pregrant"], "screenshot": str(screenshots / "automatic-companion.png")}
                 finally:
                     print("Stopping the sandbox helper and closing the browser.", flush=True)
                     await asyncio.to_thread(stop_companion, install)

@@ -1,0 +1,77 @@
+Verity local analysis integrations
+
+Model weights and third-party runtimes are not bundled in the extension or
+bootstrap payload. Setup separately downloads reviewed snapshots and packages.
+Their model cards and installed LICENSE/NOTICE files must remain intact.
+No upstream author endorses Verity or its accuracy. Model/data permissions are
+separate; GPTSniffer source/checkpoint permissions and a production known-AI
+code corpus remain unresolved and are not automatically supplied.
+
+Attribution:
+- Docling / docling-parse: MIT; native and transitive licenses in installed package.
+- Microsoft Playwright: Apache-2.0; browser distribution has separate notices.
+- Desklib ai-text-detector-v1.01: model card declares MIT; its mean-pooling and
+  single-logit architecture inform the local adapter. Snapshot README is retained.
+- BAAI bge-small-en-v1.5: model card declares MIT; snapshot README is retained.
+- Sentence Transformers: Apache-2.0; installed LICENSE and NOTICE.txt retained.
+- SameCode, AboutCode/nexB and contributors: Apache-2.0; installed NOTICE and
+  apache-2.0.LICENSE retained. No production reference corpus is bundled.
+- Falcon-7B and Falcon-7B-Instruct, Technology Innovation Institute: model cards
+  declare Apache-2.0; snapshot READMEs retained. Apache-2.0 license text is also
+  retained with installed Transformers and other Apache-licensed dependencies.
+- Binoculars method: the local ratio adapter uses the published method, with
+  remote-code loading disabled and conservative CPU resource gates. The BSD
+  license below is retained for the method implementation/attribution.
+- PyTorch, Transformers and all dependencies retain licenses in the installation.
+- The Windows native launcher separately includes the Go standard-library license.
+
+MIT terms for the MIT-declared model-card material identified above:
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Binoculars: https://github.com/ahans30/Binoculars/blob/main/LICENSE.md
+
+BSD 3-Clause License
+
+Copyright (c) 2023, Abhimanyu Hans, Avi Schwarzschild, Tom Goldstein
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.

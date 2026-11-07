@@ -94,5 +94,9 @@ test("build only ships first-party surfaces, no internal upstream identities", a
     assert.ok(manifest.permissions.includes("nativeMessaging"));
     assert.equal(!!manifest.key, target === "chrome");
   }
-  assert.doesNotMatch(await readFile("README.md", "utf8"), forbidden);
+  // Public documentation discloses actual model availability; runtimes/weights
+  // still never enter the first-party extension payload.
+  const readme = await readFile("README.md", "utf8");
+  assert.match(readme, /independently calibrated/);
+  assert.match(readme, /model availability/);
 });

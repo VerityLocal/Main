@@ -17,9 +17,9 @@ const manifest = JSON.parse(await readFile(path.join(root, "extension/manifest.j
 const pins = JSON.parse(await readFile(path.join(source, "runtime-pins.json"), "utf8"));
 const hash = createHash("sha256").update(Buffer.from(manifest.key, "base64")).digest().subarray(0, 16);
 const id = [...hash].map(b => String.fromCharCode(97 + (b >> 4), 97 + (b & 15))).join("");
-const engineFiles = ["__init__.py", "ai.py", "assets.py", "calibration.py", "detection.py", "local_os.py", "native_host.py", "pdf.py", "server.py", "similarity.py", "text.py", "web.py"];
+const engineFiles = ["__init__.py", "ai.py", "assets.py", "calibration.py", "detection.py", "local_os.py", "model_setup.py", "native_host.py", "pdf.py", "resources.py", "server.py", "similarity.py", "text.py", "web.py"];
 const extensionFiles = ["background.js", "calibration.json", "capture.js", "connection.js", "content.js", "icon.svg", "manifest.json", "panel.css", "panel.html", "panel.js", "reader.js"];
-const allowed = new Set(["Contents/Info.plist", "Contents/MacOS/Verity Installer", "Contents/Resources/install-macos.sh", "Contents/Resources/runtime-pins.sh", ...["native_entry.py", "provision.py", "provision_entry.py", "release.json", "runtime-requirements.txt", "product/extension/calibration.json"].map(x => "Contents/Resources/payload/" + x), ...engineFiles.map(x => "Contents/Resources/payload/product/engine/" + x), ...["chrome", "firefox"].flatMap(browser => extensionFiles.map(x => "Contents/Resources/payload/" + browser + "-extension/" + x))]);
+const allowed = new Set(["Contents/Info.plist", "Contents/MacOS/Verity Installer", "Contents/Resources/install-macos.sh", "Contents/Resources/runtime-pins.sh", ...["native_entry.py", "model_entry.py", "model-pins.json", "model-requirements.txt", "THIRD-PARTY-NOTICES.txt", "provision.py", "provision_entry.py", "release.json", "runtime-requirements.txt", "product/extension/calibration.json"].map(x => "Contents/Resources/payload/" + x), ...engineFiles.map(x => "Contents/Resources/payload/product/engine/" + x), ...["chrome", "firefox"].flatMap(browser => extensionFiles.map(x => "Contents/Resources/payload/" + browser + "-extension/" + x))]);
 async function checkExisting(directory, relative = "") {
   let entries;
   try {
@@ -42,7 +42,8 @@ for (const browser of ["chrome", "firefox"]) {
   for (const name of extensionFiles) await copyFile(path.join(root, "dist", browser, name), path.join(payload, browser + "-extension", name));
 }
 await copyFile(path.join(root, "extension/calibration.json"), path.join(payload, "product/extension/calibration.json"));
-for (const name of ["native_entry.py", "provision.py", "provision_entry.py"]) await copyFile(path.join(source, name), path.join(payload, name));
+for (const name of ["native_entry.py", "model_entry.py", "provision.py", "provision_entry.py"]) await copyFile(path.join(source, name), path.join(payload, name));
+for (const name of ["model-pins.json", "model-requirements.txt", "THIRD-PARTY-NOTICES.txt"]) await copyFile(path.join(root, name), path.join(payload, name));
 await copyFile(path.join(root, "runtime-requirements.txt"), path.join(payload, "runtime-requirements.txt"));
 await writeFile(path.join(payload, "release.json"), JSON.stringify({ engine_version: manifest.version, chrome_origin: "chrome-extension://" + id, firefox_id: "verity@local.invalid" }, null, 2) + "\n");
 const lines = [];
@@ -57,7 +58,7 @@ const launcher = path.join(contents, "MacOS/Verity Installer");
 await writeFile(launcher, '#!/bin/zsh\nexec "${0:A:h:h}/Resources/install-macos.sh"\n');
 await chmod(launcher, 0o755);
 await writeFile(path.join(contents, "Info.plist"), `<?xml version="1.0" encoding="UTF-8"?>\n<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">\n<plist version="1.0"><dict><key>CFBundleExecutable</key><string>Verity Installer</string><key>CFBundleIdentifier</key><string>local.verity.installer</string><key>CFBundleName</key><string>Verity Installer</string><key>CFBundlePackageType</key><string>APPL</string><key>CFBundleShortVersionString</key><string>${manifest.version}</string><key>LSMinimumSystemVersion</key><string>14.0</string><key>NSHighResolutionCapable</key><true/></dict></plist>\n`);
-await writeFile(path.join(output, "DOWNLOAD-INFO.txt"), "Double-click Verity Installer.app, approve Install, then load the extension folder shown in Finder. Runtime installation, pairing and startup are automatic. First installation requires internet. This is an unsigned development build: public downloads require developer signing and notarization. Do not disable macOS security. No production AI weights are included.\n");
+await writeFile(path.join(output, "DOWNLOAD-INFO.txt"), "Open Verity Installer.app if permitted by macOS, approve Install, then load the extension folder shown in Finder. Setup downloads the runtime, browser and about 1.9 GB of reviewed local models; Binoculars adds about 29 GB only on 64 GB+ machines. Pairing and startup are automatic. AI percentages require independent calibration; code assets need a permitted checkpoint/corpus. This is an unsigned development build, not a signed production release. Do not disable macOS security.\n");
 if (process.platform === "darwin") {
   const archive = path.join(output, "Verity-macOS.zip");
   const packed = spawnSync("/usr/bin/ditto", ["-c", "-k", "--sequesterRsrc", "--keepParent", app, archive], { stdio: "inherit" });

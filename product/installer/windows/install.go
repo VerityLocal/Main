@@ -227,10 +227,16 @@ func install(ctx context.Context, options installOptions) (folder string, instal
 		defer cancel()
 		return options.Run(commandCtx, python, args, env, log)
 	}
-	options.Progress("Installing local components. No AI weights are downloaded…")
+	options.Progress("Installing local parser, browser and model dependencies…")
 	if err := run("-I", "-m", "pip", "--isolated", "install", "--only-binary=:all:", "--disable-pip-version-check", "--index-url", "https://pypi.org/simple", "--cache-dir", cache, "-r", filepath.Join(stage, "runtime-requirements.txt")); err != nil { return "", err }
 	if err := run("-I", "-m", "playwright", "install", "chromium", "--only-shell"); err != nil { return "", err }
 	if err := run("-I", "-c", "from docling_parse.pdf_parser import DoclingPdfParser; from playwright.async_api import async_playwright; print('Local components verified.')"); err != nil { return "", err }
+	if err := run("-I", "-m", "pip", "--isolated", "install", "--only-binary=:all:", "--disable-pip-version-check", "--index-url", "https://pypi.org/simple", "--cache-dir", cache, "-r", filepath.Join(stage, "model-requirements.txt")); err != nil { return "", err }
+	options.Progress("Downloading and verifying local models. Large models are skipped when RAM is insufficient…")
+	modelCtx, modelCancel := context.WithTimeout(ctx, 90*time.Minute)
+	err = options.Run(modelCtx, python, []string{"-I", filepath.Join(stage, "model_entry.py"), "--root", options.Root, "--pins", filepath.Join(stage, "model-pins.json")}, env, log)
+	modelCancel()
+	if err != nil { return "", err }
 	if err := ctx.Err(); err != nil { return "", err }
 	root := filepath.Join(versions, time.Now().UTC().Format("20060102150405")+"-"+filepath.Base(stage))
 	if err := os.Rename(stage, root); err != nil { return "", err }

@@ -6,6 +6,7 @@ import shlex
 from pathlib import Path
 
 from product.engine.native_host import initialize_config, save_config
+from product.engine.model_setup import apply_profile
 
 HOST = "local.verity.helper"
 
@@ -28,7 +29,12 @@ def register(root, install_root, browser_home):
     registrations.append((base / "Mozilla/NativeMessagingHosts" / (HOST + ".json"), firefox))
     for path, _ in registrations:
         validate_registration(path, install_root)
-    initialize_config(config, release["chrome_origin"])
+    value = initialize_config(config, release["chrome_origin"])
+    profile = install_root / "models-profile.json"
+    if profile.exists():
+        if profile.is_symlink():
+            raise ValueError("A model profile cannot be a symlink")
+        save_config(config, apply_profile(value, json.loads(profile.read_text())))
     for path, value in registrations:
         save_config(path, value)
     save_config(install_root / "installed.json", {"version": release["engine_version"], "release_root": str(root)})

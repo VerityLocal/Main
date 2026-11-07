@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .assets import ASSET_ROLES, fingerprint, verify_assets
 from .calibration import sigmoid
+from .resources import ResourceLimit, require_memory
 
 
 class SequenceSignal:
@@ -15,16 +16,21 @@ class SequenceSignal:
         self.config, self.bundle = config, None
 
     def score(self, text):
+        if self.bundle is None:
+            require_memory(max(4, self.config.get("min_ram_gib", 4)), 1)
         import torch
         from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
         if self.bundle is None:
             path = self.config["path"]
             tokenizer = AutoTokenizer.from_pretrained(path, local_files_only=True, trust_remote_code=False)
-            model, info = AutoModelForSequenceClassification.from_pretrained(path, local_files_only=True, trust_remote_code=False, use_safetensors=True, output_loading_info=True)
+            model, info = AutoModelForSequenceClassification.from_pretrained(path, local_files_only=True, trust_remote_code=False, use_safetensors=True, output_loading_info=True, low_cpu_mem_usage=True)
             if info["missing_keys"] or info["unexpected_keys"] or info.get("mismatched_keys"):
                 raise ValueError("Incompatible local weights")
             model = model.cpu().eval()
+            label = self.config.get("ai_label_index")
+            if type(label) is not int or not 0 <= label < model.config.num_labels or model.config.num_labels < 2:
+                raise ValueError("A verified AI label mapping is required")
             self.bundle = tokenizer, model
         tokenizer, model = self.bundle
         encoded = tokenizer(text, return_tensors="pt", truncation=False)
@@ -42,6 +48,8 @@ class TextSignal:
         self.config, self.bundle = config, None
 
     def score(self, text):
+        if self.bundle is None:
+            require_memory(max(8, self.config.get("min_ram_gib", 8)), 3)
         import torch
         from transformers import AutoConfig, AutoModel, AutoTokenizer, PreTrainedModel
 
@@ -63,7 +71,7 @@ class TextSignal:
         if self.bundle is None:
             path = self.config["path"]
             tokenizer = AutoTokenizer.from_pretrained(path, local_files_only=True, trust_remote_code=False)
-            model, info = LocalTextHead.from_pretrained(path, local_files_only=True, use_safetensors=True, output_loading_info=True)
+            model, info = LocalTextHead.from_pretrained(path, local_files_only=True, use_safetensors=True, output_loading_info=True, low_cpu_mem_usage=True)
             if info["missing_keys"] or info["unexpected_keys"] or info.get("mismatched_keys"):
                 raise ValueError("Incompatible local weights")
             self.bundle = tokenizer, model.cpu().eval()
@@ -83,6 +91,9 @@ class RatioSignal:
         self.config, self.bundle = config, None
 
     def score(self, text):
+        if self.bundle is None:
+            # Gate before importing ML libraries or opening either multi-gigabyte checkpoint.
+            require_memory(max(64, self.config.get("min_ram_gib", 64)), 56)
         import torch
         from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -93,7 +104,7 @@ class RatioSignal:
                 raise ValueError("Tokenizers differ")
             models = []
             for path in paths:
-                model, info = AutoModelForCausalLM.from_pretrained(path, local_files_only=True, trust_remote_code=False, use_safetensors=True, output_loading_info=True)
+                model, info = AutoModelForCausalLM.from_pretrained(path, local_files_only=True, trust_remote_code=False, use_safetensors=True, output_loading_info=True, torch_dtype=torch.float32, low_cpu_mem_usage=True)
                 if info["missing_keys"] or info["unexpected_keys"] or info.get("mismatched_keys"):
                     raise ValueError("Incompatible local weights")
                 models.append(model.cpu().float().eval())
@@ -127,8 +138,11 @@ class CodeMatchSignal:
             return BitAverageHaloHash(value.encode().split(), size_in_bits=256)
 
         if self.hashes is None:
-            records = json.loads(Path(self.config["corpus"]).read_text())
-            if not records or len(records) > 10_000 or any(r.get("label") != "known_ai" or not r.get("provenance") for r in records):
+            corpus = Path(self.config["corpus"])
+            if corpus.stat().st_size > 16 * 1024 * 1024:
+                raise ValueError("Reference corpus exceeds limits")
+            records = json.loads(corpus.read_text())
+            if not isinstance(records, list) or not records or len(records) > 10_000 or any(not isinstance(r, dict) or r.get("label") != "known_ai" or not isinstance(r.get("provenance"), str) or not r["provenance"].strip() or not isinstance(r.get("text"), str) or not 1 <= len(r["text"]) <= 20_000 for r in records):
                 raise ValueError("Invalid reference provenance")
             self.hashes = [digest(row["text"]) for row in records]
         current = digest(text)
@@ -143,12 +157,14 @@ class AIClassifier:
         self.calibration = calibration
         self.signals = []
         self.verified = set()
+        self.states = {name: "not_configured" for name in self.TYPES}
         for name, value in config.items():
             if name in self.TYPES and value.get("enabled") and value.get("license_reviewed") and value.get("snapshot_id") and value.get("asset_manifest") and value.get("asset_manifest_sha256"):
                 weight = value.get("weight", 1)
                 if not math.isfinite(weight) or weight <= 0:
                     raise ValueError("Invalid signal weight")
                 self.signals.append((name, self.TYPES[name](value), weight, fingerprint(value)))
+                self.states[name] = "provisioned"
 
     def features(self, row):
         """Training-only raw features, never returned in user-facing results."""
@@ -165,8 +181,14 @@ class AIClassifier:
                     values[name] = score
                     weights.append((score, weight))
                     identities.append(f"{name}:{identity}")
+                    self.states[name] = "feature_computed"
+                else:
+                    self.states[name] = "unsupported_length"
+            except ResourceLimit:
+                self.states[name] = "insufficient_memory"
             except Exception:
                 # Upstream exceptions and identities never cross the product API boundary.
+                self.states[name] = "unavailable"
                 continue
         if not values:
             return {}, ""

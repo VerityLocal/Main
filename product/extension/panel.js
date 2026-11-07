@@ -20,6 +20,12 @@ async function helper(path, data, signal, restarted = false) {
   }
   const value = await response.json();
   if (!response.ok) throw new Error([401, 403].includes(response.status) ? "Pair this extension and check its local token" : response.status === 422 ? "The document could not be read. Check its text layer and size limits" : response.status === 413 ? "The document exceeds the local size limits" : response.status === 429 ? "The local helper is busy. Wait for the current operation and try again" : "The local operation could not be completed. Check document limits and helper setup");
+  if (path === "/health") {
+    const names = { text: "Prose classifier", ratio: "Prose comparison", code: "Code classifier", code_match: "Code reference matches", semantic: "Semantic similarity" };
+    const labels = { provisioned: "setup complete; inference not guaranteed", insufficient_memory: "insufficient RAM", checkpoint_required: "trained checkpoint required", corpus_required: "reference corpus required", disabled: "disabled in settings", custom_configured: "custom assets; not setup-verified", not_configured: "not configured" };
+    const states = Object.entries(value.model_setup || {}).filter(([key, state]) => names[key] && labels[state]).map(([key, state]) => `${names[key]}: ${labels[state]}`);
+    $("model-status").textContent = `${states.length ? states.join(". ") : "No automatic model profile reported"}. AI percentages require independent calibration.`;
+  }
   return value;
 }
 

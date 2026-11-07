@@ -21,12 +21,18 @@ installers are not yet available.
 
 Linux, native Windows ARM64, 32-bit Windows, Safari and mobile installation are not
 supported. Chrome/Edge unpacked installation is manual; this is not a store listing.
-Firefox compatibility is experimental. No AI models or approved calibration ship.
+Firefox compatibility is experimental. Weights are not bundled; installers acquire
+reviewed models where hardware permits. No independently approved calibration ships.
 
 ## What installers do
 
 - Download and verify digest-pinned standalone Python, then separately install
   runtime wheels and the headless retrieval browser. First install needs internet.
+- Install direct-pinned ML dependencies and acquire per-file hash-pinned Desklib
+  and BGE-small snapshots (~1.9 GB on 8 GiB+ machines, plus runtime/dependencies).
+  The Falcon pair adds ~29 GB only on 64 GiB+ machines. Available-RAM gates also
+  apply at inference. GPTSniffer and production code-corpus setup remain blocked;
+  AI percentages stay unavailable until independently calibrated. See [MODELS.md](MODELS.md).
 - Install per-user, without administrator setup. macOS uses
   `~/Library/Application Support/Verity`; Windows uses `%LOCALAPPDATA%\Verity`.
 - Register a narrowly permissioned native host for the fixed extension identities.
@@ -34,7 +40,8 @@ Firefox compatibility is experimental. No AI models or approved calibration ship
 - Preserve pairing/settings across upgrades, start/restart the authenticated helper
   on demand, and stop it after 30 idle minutes. No login service is installed.
 - Keep local environments, model checkpoints and private documents out of the
-  downloadable payload. Windows ZIPs retain compiler licensing and notices.
+  downloadable payload. Adapter notices remain in both installers; Windows ZIPs
+  also retain compiler licensing. Downloaded runtimes keep their own notices.
 
 ## Release requirements
 

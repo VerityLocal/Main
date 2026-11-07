@@ -30,6 +30,19 @@ product/.runtime/bin/python -m unittest discover -s product/tests -p 'test_*.py'
 product/.runtime/bin/python -m product.engine.server --init
 ```
 
+To enable the reviewed local model profile explicitly (about 1.9 GB on an 8 GiB+
+machine, with ~29 GB additional Falcon downloads only on 64 GiB+ machines):
+
+```sh
+product/.runtime/bin/python -m pip install --only-binary=:all: -r product/model-requirements.txt
+product/.runtime/bin/python -m product.engine.model_setup --root product/.local --pins product/model-pins.json --config product/.local/helper.json
+```
+
+This is a setup-only network operation; analysis never calls the downloader.
+The command preserves private pairing/custom settings. Code assets and independent
+calibration are not invented by setup. Read [model availability](MODELS.md) before
+running it on a large-memory workstation; it can download the full Falcon pair.
+
 On Windows use `product\.runtime\Scripts\python.exe` in place of the macOS/Linux
 interpreter path. Pair the extension's exact origin with `--allow-origin`, start
 `python -m product.engine.server` with that interpreter, and enter the generated
@@ -50,8 +63,15 @@ are not mocked. The ordinary panel tab substitutes side-panel active-tab semanti
 and loopback document permissions, so production toolbar prompts are not proven.
 Generated PDFs, screenshots and reports are ignored by Git.
 
+`python -m product.tests.browser.model_run --profile product/.local/models-profile.json`
+performs genuine offline Desklib/BGE inference, verifies asset hashes and resource
+abstention, and asserts that uncalibrated document percentages stay unavailable.
+It is a functional smoke test, not an independent accuracy benchmark.
+
 `product.tests.browser.desktop_run` tests actual native messaging against an
 explicit sandbox macOS installation using `--install-root` and `--browser-home`.
+Add `--require-models` for a model-enabled installation to verify genuine prose
+inference in exported segments, safe short-text abstention and setup-status labels.
 Never point it at an unrelated installation. Windows package structure is checked
 with `python -m product.tests.browser.windows_package`; this does not execute
 Windows or prove its browser integration.
