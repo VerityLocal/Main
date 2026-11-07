@@ -12,7 +12,7 @@ import unittest
 from pathlib import Path
 from unittest.mock import patch
 
-from internal.demo.make_pdfs import SOURCE_TEXT, pdf
+from product.tests.browser.make_pdfs import SOURCE_TEXT, pdf
 from product.engine.native_host import bootstrap, initialize_config, read_message, request_helper, validate_caller, write_message
 from product.installer.provision import HOST, register
 

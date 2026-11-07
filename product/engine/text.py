@@ -1,4 +1,4 @@
-"""Checked UTF-16 index salvaged from backend/app/document/offsets.py; new segmentation."""
+"""Checked UTF-16 indexing and bounded document segmentation."""
 import re
 from bisect import bisect_left
 

@@ -1,34 +1,39 @@
 # Verity — PDF & Website Review
 
-A browser extension for reviewing the **active PDF or website** with **our
-in-house detection engine**. It displays source-overlap percentages, estimated
-AI authorship, sentence/block evidence, attributed source links and export.
+A browser extension and local desktop companion for reviewing the **active PDF or
+website**, with source-overlap evidence, highlights, coverage, attributed links
+and export. Authorship analysis stays local when approved models are provisioned.
 
-## Install for normal use (macOS 14+)
+**[Download website](https://veritylocal.github.io/)** ·
+**[Development release](https://github.com/VerityLocal/Main/releases/tag/v0.2.0-dev.1)**
 
-1. Open **Verity Installer.app** from the download and click **Install**.
-2. Load the `chrome-extension` folder shown in Finder into Chrome or Edge.
-3. Open a PDF and click the extension. Its desktop companion starts and pairs
-   automatically—no terminal commands, Python installation or pairing token.
+## Download for macOS or Windows
 
-First installation needs internet to download the local runtime. Subsequent
-connections start the installed helper on demand; it stops after 30 idle minutes.
-Documents still stay local for authorship analysis. AI weights are not included.
-The current installer is a **development build**; publicly downloaded macOS apps
-require signing and notarization before distribution. Do not disable OS security.
-Linux one-click installation is not yet available.
+| Platform | Requirements | Download |
+| --- | --- | --- |
+| macOS | 14+, Intel or Apple Silicon | [Verity-macOS.zip](https://github.com/VerityLocal/Main/releases/download/v0.2.0-dev.1/Verity-macOS.zip) |
+| Windows | 10/11 x64 | [Verity-Windows.zip](https://github.com/VerityLocal/Main/releases/download/v0.2.0-dev.1/Verity-Windows.zip) |
 
-## Windows installer (10/11 x64 — development)
+**[Download the browser extension ZIP](https://github.com/VerityLocal/Main/releases/download/v0.2.0-dev.1/Verity-Extension.zip)**
+— the same Chrome/Edge extension for both platforms. It still requires the matching
+desktop companion for PDF extraction and analysis. Companion installers already
+include the extension; use this ZIP to load or update it separately.
 
-Open **VeritySetup.exe** and approve installation, then load the `chrome-extension`
-folder shown in Explorer into Chrome or Edge. Runtime provisioning, pairing,
-startup and restart are automatic; no terminal, Python setup or pairing token.
+**Unsigned development builds:** operating systems may warn or block installation.
+Do not disable security protections. Windows installation/browser integration and
+Intel macOS execution are not yet tested. Signed production builds are unavailable.
+AI estimates currently show **Unavailable**; no model weights or approved
+calibration are included. See [release limitations](docs/DISTRIBUTION.md).
 
-Download archive: `product/dist/installer/windows/Verity-Windows.zip`.
-First installation requires internet. This is an **unsigned development build**:
-Windows execution/browser acceptance testing and code signing are still required
-before public distribution. Do not disable Windows security. Native ARM64 and
-32-bit Windows are not supported. AI model/calibration limitations are unchanged.
+1. Extract the ZIP. Open **Verity Installer.app** on macOS or **VeritySetup.exe**
+   on Windows and approve installation if permitted by the operating system.
+2. In Chrome or Edge, enable Developer mode and **Load unpacked** using the
+   `chrome-extension` folder shown in Finder or Explorer.
+3. Open a PDF and click the extension. Pairing, runtime setup and helper
+   startup/restart are automatic—no terminal, Python setup or pairing token.
+
+First installation needs internet. The helper stops after 30 idle minutes. Linux,
+native Windows ARM64, 32-bit Windows, Safari and mobile are not supported.
 
 ## Build for development
 
@@ -36,6 +41,7 @@ With Node.js 20 or newer, build the extension or an installer:
 
 ```sh
 npm run build
+npm run build:extension
 npm run build:installer
 npm run build:installer:windows
 ```
@@ -46,12 +52,12 @@ at `product/dist/firefox`; install its manifest temporarily for development.
 Firefox PDF-viewer access varies by browser permissions and remains experimental.
 The macOS installer archive is `product/dist/installer/macos/Verity-macOS.zip`.
 Windows installer builds additionally need the maintainer toolchain described in
-`internal/windows_distribution.md`; normal users need no build tools.
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md); normal users need no build tools.
 
 ## Manual developer helper (optional)
 
-Python 3.11 or newer is required for the local helper. Provision its runtime using
-the maintained internal setup instructions. No document is sent to a cloud AI
+Python 3.11 is recommended for the local helper. Provision its runtime using
+the [development setup](docs/DEVELOPMENT.md). No document is sent to a cloud AI
 service. From the project root:
 
 ```sh
@@ -111,6 +117,12 @@ Only the pairing token is persisted by the extension. Helper scan results stay i
 memory for up to 30 minutes while it is running, with a bounded queue; exported
 reports contain document text and should be handled as private data.
 
-Sample PDFs are in `internal/demo/pdfs`. Maintainer setup, model provenance,
-calibration, tests and demo instructions are internal and never copied into the
-distributed extension. Historical research trees are not part of this product.
+## Repository layout
+
+- `product/extension` — browser UI, document capture and connection.
+- `product/engine` and `product/installer` — local analysis and desktop provisioning.
+- `product/tests` and `product/tools` — required tests, fixture generators and asset/calibration tools.
+- `docs` — development, distribution, security and model guidance.
+
+Generated installers are distributed through GitHub Releases, not committed.
+Internal reports, historical research, credentials and model assets are excluded.

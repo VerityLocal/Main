@@ -84,7 +84,7 @@ try {
   for (const browser of ["chrome", "firefox"]) for (const name of extensionFiles) await add(browser + "-extension/" + name, path.join(root, "dist", browser, name));
   await add("product/extension/calibration.json", path.join(root, "extension/calibration.json"));
   for (const name of ["native_entry.py", "provision_windows.py", "provision_windows_entry.py", "runtime-pins.json"]) await add(name, path.join(source, name));
-  await add("runtime-requirements.txt", path.join(root, "../internal/runtime-requirements.txt"));
+  await add("runtime-requirements.txt", path.join(root, "runtime-requirements.txt"));
   await add("release.json", null, JSON.stringify({ engine_version: manifest.version, chrome_origin: "chrome-extension://" + id, firefox_id: "verity@local.invalid" }, null, 2) + "\n");
   const license = await readFile(path.join(goRoot, "LICENSE"), "utf8");
   await add("licenses/go-LICENSE.txt", null, license);

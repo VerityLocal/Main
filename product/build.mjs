@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 const root = path.dirname(fileURLToPath(import.meta.url));
 const files = ["panel.html", "panel.css", "panel.js", "background.js", "content.js", "capture.js", "reader.js", "connection.js", "icon.svg", "calibration.json"];
+export const extensionFiles = [...files, "manifest.json"];
 const manifest = JSON.parse(await readFile(path.join(root, "extension/manifest.json"), "utf8"));
 for (const target of ["chrome", "firefox"]) {
   const out = path.join(root, "dist", target);

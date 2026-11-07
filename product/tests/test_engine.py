@@ -9,9 +9,9 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-from internal.demo.make_pdfs import AI_TEXT, ORIGINAL_TEXT, SOURCE_TEXT, pdf
-from internal.retraining.controlled_pairs import records
-from internal.retraining.train import read_data, train
+from product.tests.browser.make_pdfs import AI_TEXT, ORIGINAL_TEXT, SOURCE_TEXT, pdf
+from product.tests.calibration_fixtures import records
+from product.tools.train_calibration import read_data, train
 from product.engine.ai import AIClassifier
 from product.engine.assets import file_digest, fingerprint, inventory, verify_assets
 from product.engine.calibration import Calibration

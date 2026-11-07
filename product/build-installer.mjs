@@ -43,7 +43,7 @@ for (const browser of ["chrome", "firefox"]) {
 }
 await copyFile(path.join(root, "extension/calibration.json"), path.join(payload, "product/extension/calibration.json"));
 for (const name of ["native_entry.py", "provision.py", "provision_entry.py"]) await copyFile(path.join(source, name), path.join(payload, name));
-await copyFile(path.join(root, "../internal/runtime-requirements.txt"), path.join(payload, "runtime-requirements.txt"));
+await copyFile(path.join(root, "runtime-requirements.txt"), path.join(payload, "runtime-requirements.txt"));
 await writeFile(path.join(payload, "release.json"), JSON.stringify({ engine_version: manifest.version, chrome_origin: "chrome-extension://" + id, firefox_id: "verity@local.invalid" }, null, 2) + "\n");
 const lines = [];
 for (const [arch, entry] of Object.entries(pins.macos)) {

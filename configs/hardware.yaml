@@ -1,7 +1,0 @@
-schema_version: "1.0.0"
-gpu_allocated_ceiling_gib: 3.5
-driver_free_headroom_mib: 384
-serialize_gpu_jobs: true
-allow_training_with_inference: false
-cpu_fallback: true
-profiling_timeout_seconds: 3.0
