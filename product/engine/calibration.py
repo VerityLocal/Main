@@ -10,7 +10,7 @@ def sigmoid(value):
 
 class Calibration:
     def __init__(self, path=None, allow_development=False):
-        path = path or Path(__file__).parents[1] / "extension/calibration.json"
+        path = path or Path(__file__).with_name("calibration.json")
         self.artifact = json.loads(Path(path).read_text())
         self.allow_development = allow_development
         if self.artifact.get("schema_version") != 1:

@@ -1,106 +1,47 @@
-# Models, calibration and attribution
+# Standard models and calibration
 
-The existing extension and local desktop companions are preserved. Setup acquires
-permitted immutable snapshots; inference is offline and does not download weights.
-**AI percentages remain Unavailable until independently calibrated.** Successful
-inference is not a detector-accuracy, data-rights or fine-tuning claim.
+The Python app ZIP includes actual approved weights, tokenizers and model cards.
+No model download occurs at first launch or during inference. Config paths are
+resolved inside the app after relocation; the build-bound pin digest prevents an
+edited manifest/pins file from silently authorizing different weights.
 
-## Components and actual availability
+| Model | Role | Exact revision | License |
+| --- | --- | --- | --- |
+| desklib/ai-text-detector-v1.01 | English prose feature, mean-pooling/single-logit head | `5fdea974cd4287c61674951ec78803aa274e2fb7` | MIT, as declared by retained model card |
+| BAAI/bge-small-en-v1.5 | English semantic source similarity | `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a` | MIT, as declared by retained model card |
 
-| Component | Role | Development status / license |
-| --- | --- | --- |
-| [Docling / docling-parse](https://github.com/docling-project/docling-parse) | PDF text extraction | Native text-layer parsing tested; MIT. No OCR or ML layout-ordering claim. Native/transitive notices remain in the installed runtime. |
-| [Playwright](https://github.com/microsoft/playwright) | Consent-based source retrieval | Actual browser retrieval with public-network restrictions; Apache-2.0. Controlled-source fixtures do not prove live-search recall. Browser binaries retain separate notices. |
-| [Desklib](https://huggingface.co/desklib/ai-text-detector-v1.01) | English prose authorship feature | MIT model-card license. Automatically acquired on 8 GiB+ machines; mean-pooling/single-logit adapter, not bare DeBERTa. Needs 3 GiB available RAM before a cold load. |
-| [Binoculars](https://github.com/ahans30/Binoculars) | Prose causal-model ratio feature | BSD-3-Clause method attribution; Falcon-7B and Falcon-7B-Instruct cards specify Apache-2.0. Automatically skipped below 64 GiB physical RAM; CPU float32 loading additionally requires 56 GiB available RAM. Full-pair inference has **not** been tested on this 16 GiB Mac. |
-| [GPTSniffer](https://github.com/MDEGroup/GPTSniffer) | Code-only trained classifier | Adapter exists, but **checkpoint/permission required**. Upstream license metadata was absent at review; no permitted trained checkpoint was supplied or downloaded. Bare CodeBERT or an initialized head is not a substitute. An explicit verified AI-label index is required. |
-| [SameCode](https://github.com/aboutcode-org/ai-gen-code-search) | Offline reference-code matching | SameCode 0.5.1 installed; Apache-2.0 + NOTICE retained. **Production corpus required** with reviewed rights and known-AI provenance. A genuine first-party AI-authored development fixture tests matching only, not accuracy or independent calibration. |
-| [Sentence Transformers](https://github.com/UKPLab/sentence-transformers) | Semantic source similarity | Apache-2.0 library; MIT BAAI/bge-small-en-v1.5 snapshot. Automatically acquired on 4 GiB+ machines; needs 0.5 GiB available RAM before a cold load. Lexical evidence remains available if semantic inference fails. |
+The selected raw model assets total approximately 1.9 GB **before** Python,
+dependencies/browser and ZIP compression. Final measured ZIP sizes are published
+separately. Docling-parse supplies text-layer PDF extraction (MIT), Playwright
+consented retrieval (Apache-2.0), and Sentence Transformers semantic loading
+(Apache-2.0). All notices/model cards stay inside the bundle.
 
-The supported profile is English, bounded single passages. Code/prose domain
-selection is heuristic, not a verified language classifier. Oversize token sequences
-abstain instead of silently truncating. Related-topic semantic similarity and
-reference-code matching are not proof of copying or authorship.
+## Boundaries
 
-## Pinned acquisition and resource boundary
+- **No AI-written percentage or calibrated confidence ships.** The calibration
+  artifact has no fitted heads. Genuine eligible inference reports
+  `calibration_required`; missing assets or unsupported inputs abstain.
+- Desklib requires 8 GiB physical / 3 GiB available RAM before cold load; BGE
+  requires 4 GiB / 0.5 GiB. CPU-only inference is not an OOM guarantee.
+- All snapshot files are hashed before a cold model load. Missing, changed, extra
+  or linked files fail verification. Loading is local-only, safetensors-only and
+  remote-code-disabled. Oversize token sequences abstain rather than truncate.
+- English support is bounded; code/prose routing is heuristic. The Standard app
+  **excludes Falcon/Binoculars, GPTSniffer and a production reference-code corpus**.
+  Code review/source comparison works, but no code authorship detector is enabled.
+- Semantic relatedness alone is not copying. Lexical evidence and human review
+  remain necessary. Failed semantic loading does not invent a probability.
 
-`product/model-pins.json` records exact revisions, selected files, byte counts and
-SHA-256 digests. The curated downloader accepts only reviewed HTTPS model hosts,
-disables proxy inheritance, rejects executable/pickle weight formats, verifies
-complete snapshots, and atomically promotes them. Changed snapshots are never
-silently repaired or overwritten. Keep downloaded assets private and immutable.
+`product/model-pins.json` records per-file sizes/digests. Only the two Standard
+snapshots are shipped. Build-time downloads use reviewed HTTPS hosts and disable
+proxy inheritance; app analysis never invokes the acquisition code.
 
-| Snapshot | Exact revision | Selected download |
-| --- | --- | --- |
-| desklib/ai-text-detector-v1.01 | `5fdea974cd4287c61674951ec78803aa274e2fb7` | ~1.74 GB |
-| BAAI/bge-small-en-v1.5 | `5c38ec7c405ec4b44b94cc5a9bb96e735b38267a` | ~134 MB |
-| tiiuae/falcon-7b | `ec89142b67d748a1865ea4451372db8313ada0d8` | ~14.44 GB |
-| tiiuae/falcon-7b-instruct | `8782b5c5d8c9290412416618f36a133653e85285` | ~14.44 GB |
+## Calibration research
 
-The normal model download is ~1.9 GB, **in addition to** Python, parser/browser and
-ML wheels. The Falcon pair adds ~28.87 GB download and ~57.74 GB of float32 weights
-alone. Free disk space is checked per snapshot, with 1 GiB reserve. These are
-conservative gates, not validated minimum hardware recommendations; other running
-applications and temporary allocations can still prevent inference. No quantized,
-GPU, reduced-memory or Intel-macOS execution claim is made.
-
-Models live outside versioned runtime directories: `models/` and
-`models-profile.json` under the private install root. Reinstallation reuses verified
-snapshots and preserves pairing, custom assets and operator-disabled choices.
-The extension's Settings displays neutral setup states. **Setup complete** means
-the managed acquisition finished, not a successful inference or calibrated result;
-custom and disabled settings are labeled separately.
-
-`product/model-requirements.txt` pins direct ML dependencies and NumPy/Pandas
-compatibility. Intel macOS uses the last supported upstream Torch wheel, 2.2.2;
-Apple Silicon and Windows use 2.7.0. Transitive locks, vulnerability review and
-platform-specific runtime acceptance remain production gates.
-
-## Local functional validation (Apple Silicon, 16 GiB RAM)
-
-Genuine offline inference with the pinned Desklib trained head and BGE-small passed,
-alongside complete asset-hash verification and overlength abstention. A controlled
-source match used real semantic inference; all document AI percentages/confidence
-remained unavailable without calibration. One smoke run measured ~19.3 seconds for
-the cold Desklib feature, ~0.29 seconds for cold semantic inference, and ~1.83 GiB
-process peak RSS. These single-run figures are not supported minimums, performance
-guarantees or independently labeled detector evaluation. Binoculars resource
-abstention and genuine SameCode development-fixture matching passed; full Falcon
-and GPTSniffer inference remain unexecuted.
-
-A fresh standalone-runtime macOS sandbox install also passed actual Chromium
-native messaging, automatic pairing/start/restart, PDF extraction and JSON export.
-All eligible exported prose segments reported `calibration_required` after genuine
-inference; short segments reported `insufficient_text`, with null scores/confidence.
-Installed Desklib/BGE offline inference and hash checks passed separately. Browser
-toolbar/default-profile flows and other platform gates remain untested.
-
-## Custom assets and independent calibration
-
-`product/runtime-config.example.json` documents optional custom configuration.
-Obtain snapshots intentionally under reviewed source/checkpoint/data terms. Do not
-infer data rights from a model-card license. Review exact revisions, classifier
-architecture and label mappings. Inventory each complete local asset with:
-
-```sh
-python -m product.tools.hash_assets --config product/.local/helper.json --signal text --output private/manifests/text.json
-```
-
-Set the resulting manifest path and SHA-256 in configuration. Repeat for other
-signals or semantic comparison; snapshot names alone do not prove integrity.
-Missing, changed, extra or linked assets abstain. Custom code-corpus records require
-`text`, `label: "known_ai"` and nonempty `provenance`, with reviewed rights; an
-invented or AI-generated reference collection must not be labeled a production
-corpus or independent evaluation set.
-
-`product.tools.extract_scores` computes real local features from externally labeled
-JSONL. `product.tools.train_calibration` fits small logistic heads with grouped
-train/validation/test separation and held-out metrics. Outputs remain
-`production_approved: false`; independent review is required before a matching
-signature head can activate. Tests and demonstration passages are not authorship
-benchmarks. Never use raw sigmoid/ratio/corpus features as AI percentages.
-
-The extension ships first-party UI and a disabled calibration artifact, not models
-or upstream runtimes. Model cards remain with snapshots; installed packages retain
-LICENSE/NOTICE files. Required adapter attributions ship in
-`product/THIRD-PARTY-NOTICES.txt`. Restricted code/checkpoints are not bundled.
+`product.tools.extract_scores` extracts genuine features from externally labeled
+JSONL against a Standard bundle. `product.tools.train_calibration` fits grouped
+train/validation/test logistic heads with `production_approved: false` by default.
+Neither tool is a user-facing app setup requirement. Independent evaluation,
+license/data-rights review and matching signatures are required before any future
+authorship probabilities can be enabled. Functional fixtures and controlled source
+matches are not calibration data, detector accuracy or upstream endorsement.

@@ -29,6 +29,8 @@ dist/
 build/
 test-results/
 product/.runtime/
+product/.desktop-runtime/
+product/.desktop-stage*/
 product/.windows-build-*/
 product/.local/
 product/tests/browser/pdfs/

@@ -1,61 +1,47 @@
-# Desktop distribution
+# Standard desktop distribution
 
-Downloads: https://veritylocal.github.io/ ·
-Development release: https://github.com/VerityLocal/Main/releases/tag/v0.2.0-dev.1
+Release: https://github.com/VerityLocal/Main/releases/tag/v0.3.0-dev.1
+Website: https://veritylocal.github.io/
 
-`Verity-Extension.zip` is one Chrome/Edge package shared across macOS and Windows.
-It does not replace the local companion: install the matching desktop companion
-for PDF extraction and analysis. Companion installers already include this extension.
+The Standard ZIP contains one native frozen Python app, all dependencies,
+Desklib/BGE weights and tokenizers, immutable configuration and license notices.
+There is no installation downloader, extension registration, listener port, helper
+service, startup item or pairing token. Local first launch/inference works offline.
 
-## Current status
-
-The macOS and Windows downloads are **unsigned development builds**, not signed,
-production-validated installers. macOS may block the app; Windows may warn or block
-the executable. Do not disable operating-system security to run them. Signed
-installers are not yet available.
-
-| Platform | Target | Validation boundary |
+| Platform | Asset | Validation gate |
 | --- | --- | --- |
-| macOS | 14+, Intel / Apple Silicon | Apple Silicon sandbox installation and actual Chromium native messaging passed; Intel and normal toolbar/profile flows remain untested. |
-| Windows | 10/11 x64 | Cross-build, PE manifest, archive integrity and portable provisioning checks passed; real Windows installation, DACLs and browser integration are not tested. |
+| macOS Apple Silicon | `Verity-Standard-macOS-arm64.zip` | Actual native frozen-app and re-extracted ZIP acceptance on Apple Silicon. Other macOS versions need separate testing. |
+| Windows x64 | `Verity-Standard-Windows-x64.zip` | Build and execute on a native Windows runner; publish only after its frozen-app and re-extracted ZIP reports pass. |
 
-Linux, native Windows ARM64, 32-bit Windows, Safari and mobile installation are not
-supported. Chrome/Edge unpacked installation is manual; this is not a store listing.
-Firefox compatibility is experimental. Weights are not bundled; installers acquire
-reviewed models where hardware permits. No independently approved calibration ships.
+Only accepted assets are published. Intel macOS, Windows ARM64, 32-bit Windows,
+Linux and mobile are not offered. Keep the `.app` intact on macOS and the complete
+Verity folder intact on Windows. No user Python installation is required.
 
-## What installers do
+## Development limitations
 
-- Download and verify digest-pinned standalone Python, then separately install
-  runtime wheels and the headless retrieval browser. First install needs internet.
-- Install direct-pinned ML dependencies and acquire per-file hash-pinned Desklib
-  and BGE-small snapshots (~1.9 GB on 8 GiB+ machines, plus runtime/dependencies).
-  The Falcon pair adds ~29 GB only on 64 GiB+ machines. Available-RAM gates also
-  apply at inference. GPTSniffer and production code-corpus setup remain blocked;
-  AI percentages stay unavailable until independently calibrated. See [MODELS.md](MODELS.md).
-- Install per-user, without administrator setup. macOS uses
-  `~/Library/Application Support/Verity`; Windows uses `%LOCALAPPDATA%\Verity`.
-- Register a narrowly permissioned native host for the fixed extension identities.
-  Windows uses HKCU in both registry views and an `asInvoker` GUI executable.
-- Preserve pairing/settings across upgrades, start/restart the authenticated helper
-  on demand, and stop it after 30 idle minutes. No login service is installed.
-- Keep local environments, model checkpoints and private documents out of the
-  downloadable payload. Adapter notices remain in both installers; Windows ZIPs
-  also retain compiler licensing. Downloaded runtimes keep their own notices.
+Unsigned development prerelease. macOS has only an ad-hoc signature, no Developer
+ID/notarization; Windows is not Authenticode-signed. OS security may block launch.
+Never advise disabling OS protections. Signing and independently calibrated AI
+percentages remain unavailable. Functional inference is not detector accuracy.
 
-## Release requirements
+The exact ZIP sizes and SHA-256 digests belong to the release metadata and
+`SHA256SUMS.txt`; never describe the raw 1.9 GB model size as the whole app ZIP.
+Each ZIP must be **smaller than 2,147,483,648 bytes**. Checksums detect changes,
+not publisher identity or signing trust.
 
-Development downloads are explicitly labeled as prereleases. Before a production
-release: test clean installation, repair/reinstall, cancellation, automatic native
-startup/restart and PDFs on every supported platform/browser; complete dependency,
-license and network-policy reviews; lock transitive dependencies; sign/notarize
-macOS output and Authenticode-sign Windows output. Recompute checksums after signing.
+## Publication gate
 
-Signing credentials are never committed. Package notices must be retained; making
-source available does not grant permission to redistribute restricted model assets.
-AI accuracy, independent calibration and live source recall are separate validation
-gates, not consequences of successfully building an installer.
+1. Test unit/controller/GUI cases and the genuine native packaged app.
+2. Check all pinned model files, licenses, Python/Tcl/Tk, dependencies and retrieval
+   browser. Ensure no credentials, private input, profiles, source environments or
+   obsolete extension/installer payloads are included.
+3. Archive without breaking app symlinks/executable modes. Verify contents, byte
+   size and hash; re-extract and re-run actual executable acceptance offline.
+4. Record tested OS/architecture and the validation boundary. Live web recall,
+   broader clean-machine acceptance, vulnerability review, signing and independent
+   calibration are separate production gates.
+5. Push accepted source and create a **new prerelease**. Never replace prior
+   downloads. Update website/profile links only to published accepted assets.
 
-Release assets live on GitHub Releases, not in the source tree. `SHA256SUMS.txt`
-identifies the exact extension and installer ZIPs; checksums detect accidental changes, not
-publisher identity or operating-system signing.
+Previous `v0.2.0-dev.1` assets are the retired extension/companion architecture and
+remain preserved. The prior source is in Git history and a local ignored archive.

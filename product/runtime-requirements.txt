@@ -1,8 +1,0 @@
-# Separately installed local runtime; never copied into the browser distribution.
-docling-parse==7.24.2
-playwright==1.64.1
-# Optional AI / semantic extras, installed only after snapshot/license review:
-# torch==2.7.0
-# transformers==4.51.3
-# sentence-transformers==4.1.0
-# samecode==0.5.1

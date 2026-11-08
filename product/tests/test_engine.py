@@ -1,15 +1,13 @@
 import asyncio
-import http.client
 import json
 import socket
 import tempfile
-import threading
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import AsyncMock, patch
 
-from product.tests.browser.make_pdfs import AI_TEXT, ORIGINAL_TEXT, SOURCE_TEXT, pdf
+from product.desktop.fixtures import ORIGINAL_TEXT, SOURCE_TEXT, pdf
 from product.tests.calibration_fixtures import records
 from product.tools.train_calibration import read_data, train
 from product.engine.ai import AIClassifier
@@ -17,7 +15,6 @@ from product.engine.assets import file_digest, fingerprint, inventory, verify_as
 from product.engine.calibration import Calibration
 from product.engine.detection import Cancelled, DetectionEngine
 from product.engine.pdf import extract_pdf
-from product.engine.server import Jobs, make_server
 from product.engine.similarity import Semantic, compare, lexical
 from product.engine.text import Utf16Index, aggregate, segment
 from product.engine.web import WebSources, public_target, source_url
@@ -95,7 +92,7 @@ class EngineTests(unittest.TestCase):
         class Failed(FixtureSources):
             async def search(self, query):
                 return [], False
-        result = DetectionEngine(classifier=FixtureAI(), source_factory=Failed).run(AI_TEXT, consent=True)
+        result = DetectionEngine(classifier=FixtureAI(), source_factory=Failed).run(ORIGINAL_TEXT, consent=True)
         self.assertIsNone(result["overall"]["plagiarism"]["percent"])
         self.assertAlmostEqual(result["overall"]["ai"]["percent"], 80)
 
@@ -117,15 +114,6 @@ class EngineTests(unittest.TestCase):
         result = aggregate(rows, "ai")
         self.assertAlmostEqual(result["percent"], 35)
         self.assertAlmostEqual(result["coverage"], .8)
-
-    def test_terminal_results_expire_without_another_scan(self):
-        jobs = Jobs(DetectionEngine())
-        try:
-            jobs.rows = {"old": {"state": "completed", "created": 0, "result": {"text": "private text"}}}
-            self.assertIsNone(jobs.get("old"))
-            self.assertEqual(jobs.rows, {})
-        finally:
-            jobs.executor.shutdown(wait=True)
 
     def test_public_destination_policy(self):
         def resolver(address):
@@ -244,72 +232,6 @@ class AssetTests(unittest.TestCase):
             (snapshot / "link").symlink_to(manifest)
             with self.assertRaises(ValueError):
                 inventory(snapshot)
-
-
-class ServerTests(unittest.TestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.token = "t" * 43
-        cls.origin = "chrome-extension://" + "a" * 32
-        cls.server = make_server({"token": cls.token, "origins": [cls.origin]}, engine=DetectionEngine(source_factory=FixtureSources))
-        cls.thread = threading.Thread(target=cls.server.serve_forever, daemon=True)
-        cls.thread.start()
-
-    @classmethod
-    def tearDownClass(cls):
-        cls.server.shutdown()
-        cls.server.server_close()
-        cls.server.jobs.executor.shutdown(wait=True)
-
-    def request(self, method, path, data=None, token=None, origin=None, headers=None):
-        connection = http.client.HTTPConnection("127.0.0.1", 8790, timeout=10)
-        value = {"Authorization": "Bearer " + (token if token is not None else self.token)}
-        if data is not None:
-            value["Content-Type"] = "application/json"
-        if origin:
-            value["Origin"] = origin
-        value.update(headers or {})
-        connection.request(method, path, body=json.dumps(data) if data is not None else None, headers=value)
-        response = connection.getresponse()
-        output = response.read()
-        connection.close()
-        return response.status, output, response.headers
-
-    def test_auth_origin_host_and_preflight(self):
-        self.assertEqual(self.request("GET", "/health", token="bad")[0], 401)
-        self.assertEqual(self.request("GET", "/health", origin="https://evil.invalid")[0], 403)
-        self.assertEqual(self.request("GET", "/health", headers={"Host": "evil.invalid"})[0], 403)
-        self.assertEqual(self.request("GET", "/health", origin=self.origin)[0], 200)
-        self.assertEqual(self.request("OPTIONS", "/jobs", origin=self.origin, headers={"Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "authorization,content-type"})[0], 204)
-        self.assertEqual(self.request("OPTIONS", "/jobs", origin=self.origin, headers={"Access-Control-Request-Method": "POST", "Access-Control-Request-Headers": "x-untrusted"})[0], 403)
-
-    def test_text_validation(self):
-        self.assertEqual(self.request("POST", "/jobs", {"text": SOURCE_TEXT, "consent": "yes"})[0], 422)
-        self.assertEqual(self.request("POST", "/jobs", {"text": ""})[0], 422)
-        code, body, _ = self.request("POST", "/jobs", {"text": SOURCE_TEXT})
-        self.assertEqual(code, 202)
-        identifier = json.loads(body)["id"]
-        self.assertEqual(self.request("POST", f"/jobs/{identifier}/cancel", {})[0], 200)
-
-    def test_no_upstream_error_leak(self):
-        import base64
-        code, body, _ = self.request("POST", "/extract", {"data": base64.b64encode(b"bad").decode()})
-        self.assertEqual(code, 422)
-        self.assertNotIn(b"docling", body.lower())
-
-    def test_pdf_bytes_through_authenticated_endpoint(self):
-        import base64
-        code, body, _ = self.request("POST", "/extract", {"data": base64.b64encode(pdf("Heading", [SOURCE_TEXT])).decode()}, origin=self.origin)
-        self.assertEqual(code, 200)
-        self.assertIn(SOURCE_TEXT, json.loads(body)["text"])
-
-    def test_native_pairing_requires_auth_and_no_web_origin(self):
-        origin = "moz-extension://" + "d" * 36
-        self.assertEqual(self.request("POST", "/pair", {"origin": origin}, token="bad")[0], 401)
-        self.assertEqual(self.request("POST", "/pair", {"origin": origin}, origin=self.origin)[0], 403)
-        self.assertEqual(self.request("POST", "/pair", {"origin": "https://evil.invalid"})[0], 403)
-        self.assertEqual(self.request("POST", "/pair", {"origin": origin})[0], 200)
-        self.assertEqual(self.request("GET", "/health", origin=origin)[0], 200)
 
 
 if __name__ == "__main__":

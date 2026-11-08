@@ -3,7 +3,7 @@ import argparse
 import json
 from pathlib import Path
 
-from product.engine.server import DEFAULT_CONFIG  # Establish offline environment before imports.
+from product.desktop.config import bundle_root, offline_policy, standard_config
 from product.engine.ai import AIClassifier
 from product.engine.calibration import Calibration
 from product.engine.text import words
@@ -12,12 +12,13 @@ from product.engine.text import words
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--data", type=Path, required=True)
-    parser.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    parser.add_argument("--bundle", type=Path, default=bundle_root())
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     if args.output.exists():
         raise SystemExit("Output must be new")
-    config = json.loads(args.config.read_text())
+    offline_policy(args.bundle)
+    config = standard_config(args.bundle)
     classifier = AIClassifier(config.get("signals", {}), Calibration())
     output = []
     for line in args.data.read_text().splitlines():

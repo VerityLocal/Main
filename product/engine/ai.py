@@ -157,6 +157,7 @@ class AIClassifier:
         self.calibration = calibration
         self.signals = []
         self.verified = set()
+        self.failure_observer = None  # Explicit developer diagnostics only; never a user result.
         self.states = {name: "not_configured" for name in self.TYPES}
         for name, value in config.items():
             if name in self.TYPES and value.get("enabled") and value.get("license_reviewed") and value.get("snapshot_id") and value.get("asset_manifest") and value.get("asset_manifest_sha256"):
@@ -186,9 +187,11 @@ class AIClassifier:
                     self.states[name] = "unsupported_length"
             except ResourceLimit:
                 self.states[name] = "insufficient_memory"
-            except Exception:
+            except Exception as error:
                 # Upstream exceptions and identities never cross the product API boundary.
                 self.states[name] = "unavailable"
+                if self.failure_observer:
+                    self.failure_observer(name, error)
                 continue
         if not values:
             return {}, ""

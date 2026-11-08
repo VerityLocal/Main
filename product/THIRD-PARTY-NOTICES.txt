@@ -1,8 +1,10 @@
-Verity local analysis integrations
+Verity Standard desktop bundle · third-party notices
 
-Model weights and third-party runtimes are not bundled in the extension or
-bootstrap payload. Setup separately downloads reviewed snapshots and packages.
-Their model cards and installed LICENSE/NOTICE files must remain intact.
+This Python desktop app includes the Desklib and BGE model weights, tokenizers,
+Python/Tcl/Tk, dependencies and the Playwright retrieval browser. Their model
+cards and bundled licenses/ notices must remain intact. Dependency notices are
+retained under bundle/licenses and in installed package metadata. No model or
+runtime download is required when the packaged application runs.
 No upstream author endorses Verity or its accuracy. Model/data permissions are
 separate; GPTSniffer source/checkpoint permissions and a production known-AI
 code corpus remain unresolved and are not automatically supplied.
@@ -14,16 +16,15 @@ Attribution:
   single-logit architecture inform the local adapter. Snapshot README is retained.
 - BAAI bge-small-en-v1.5: model card declares MIT; snapshot README is retained.
 - Sentence Transformers: Apache-2.0; installed LICENSE and NOTICE.txt retained.
-- SameCode, AboutCode/nexB and contributors: Apache-2.0; installed NOTICE and
-  apache-2.0.LICENSE retained. No production reference corpus is bundled.
-- Falcon-7B and Falcon-7B-Instruct, Technology Innovation Institute: model cards
-  declare Apache-2.0; snapshot READMEs retained. Apache-2.0 license text is also
-  retained with installed Transformers and other Apache-licensed dependencies.
-- Binoculars method: the local ratio adapter uses the published method, with
+- SameCode, GPTSniffer and Falcon/Binoculars are NOT part of the Standard bundle.
+- Binoculars method attribution for the retained optional engine adapter:
   remote-code loading disabled and conservative CPU resource gates. The BSD
   license below is retained for the method implementation/attribution.
 - PyTorch, Transformers and all dependencies retain licenses in the installation.
-- The Windows native launcher separately includes the Go standard-library license.
+- Python: PSF license; Tcl/Tk: BSD-style license; PyInstaller: GPL with the
+  bootloader exception permitting distribution of frozen applications.
+- Chromium headless shell: Chromium and third-party notices remain in the
+  browser directory. The retrieval browser only starts after scan consent.
 
 MIT terms for the MIT-declared model-card material identified above:
 

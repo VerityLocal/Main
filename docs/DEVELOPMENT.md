@@ -1,93 +1,55 @@
-# Development
+# Python desktop development
 
-The maintained product is entirely in `product/`. Historical research, private
-assets and generated outputs are not repository inputs.
+Normal users extract and open the platform app ZIP. Commands here are only for
+maintainers. Build **natively** on macOS Apple Silicon or Windows x64 with CPython
+3.11 and working Tcl/Tk. No Node.js, Go, extension or web server is used.
 
-## Extension
+## Runtime and model staging
 
-Node.js 20+ is required; the build and JavaScript tests have no npm dependencies.
-
-```sh
-npm run build
-npm run build:extension
-npm test
-```
-
-Load `product/dist/chrome` through Chrome/Edge's **Load unpacked** control.
-`product/dist/downloads/Verity-Extension.zip` is the same extension package for
-macOS and Windows. It still requires the matching desktop companion for analysis.
-`product/dist/firefox` is an experimental temporary-install build.
-
-## Local helper and Python tests
-
-Use Python 3.11 and a dedicated development environment:
+Create a dedicated environment; install `product/desktop-requirements.txt` and
+`product/build-requirements.txt` with binary wheels. On Windows use the official
+PyTorch CPU wheel (`torch==2.7.0+cpu`) from `https://download.pytorch.org/whl/cpu`
+before installing the other requirements. On macOS use the regular arm64 wheel.
 
 ```sh
-python3.11 -m venv product/.runtime
-product/.runtime/bin/python -m pip install -r product/runtime-requirements.txt
-product/.runtime/bin/python -m playwright install chromium --only-shell
-product/.runtime/bin/python -m unittest discover -s product/tests -p 'test_*.py'
-product/.runtime/bin/python -m product.engine.server --init
+python -m pip install --only-binary=:all: -r product/desktop-lock.txt -r product/build-requirements.txt
+python -m playwright install chromium --only-shell
+python -m product.packaging.prepare --output product/.local/desktop-bundle --browsers PATH_TO_PLAYWRIGHT_CACHE
+python -m product.desktop.main
 ```
 
-To enable the reviewed local model profile explicitly (about 1.9 GB on an 8 GiB+
-machine, with ~29 GB additional Falcon downloads only on 64 GiB+ machines):
+`prepare` intentionally downloads only reviewed Desklib/BGE snapshots, using exact
+revisions, byte counts and SHA-256 pins. Add `--models PATH_TO_EXISTING_MODELS` to
+copy already-verified snapshots without downloading. Original files are never
+changed. Always choose a **new** output directory. This build-time acquisition
+is never called by the desktop app. Keep model assets and browser caches ignored.
+
+## Tests and frozen app
 
 ```sh
-product/.runtime/bin/python -m pip install --only-binary=:all: -r product/model-requirements.txt
-product/.runtime/bin/python -m product.engine.model_setup --root product/.local --pins product/model-pins.json --config product/.local/helper.json
+python -m unittest discover -s product/tests -p 'test_*.py'
+python -m product.packaging.build --bundle product/.local/desktop-bundle --output product/dist/standard-native
 ```
 
-This is a setup-only network operation; analysis never calls the downloader.
-The command preserves private pairing/custom settings. Code assets and independent
-calibration are not invented by setup. Read [model availability](MODELS.md) before
-running it on a large-memory workstation; it can download the full Falcon pair.
+Run the resulting **actual executable** with `--acceptance-output NEW_FOLDER`.
+On macOS it is `Verity.app/Contents/MacOS/Verity`; on Windows it is
+`Verity/Verity.exe`. Assert the resulting `acceptance.json` has `passed: true` and
+`frozen: true`. The ordinary app needs no arguments.
 
-On Windows use `product\.runtime\Scripts\python.exe` in place of the macOS/Linux
-interpreter path. Pair the extension's exact origin with `--allow-origin`, start
-`python -m product.engine.server` with that interpreter, and enter the generated
-private token under **Advanced development connection**. Installer users do not
-need these steps. Do not commit `product/.local/helper.json`.
+Acceptance exercises all four real Tk tabs, complete model integrity, PDF parsing,
+genuine Desklib/BGE inference with Python outbound networking blocked, a real
+bundled browser with in-memory routed content, coverage, unavailable AI percentages,
+selection/highlights, explicit exports, edit invalidation, hard cancellation,
+consent revocation and memory clearing. First-party text is a **functional fixture**,
+not independently labeled evaluation data. It does not prove live-search recall,
+OS signing, clean-machine compatibility or detector accuracy.
 
-## Browser acceptance fixtures
+Chromium is copied after freezing to preserve its own native binary layout and
+notices. macOS output receives an ad-hoc signature, not notarization. Do not inject
+signing credentials into source. `product/packaging/verity.spec` excludes obsolete
+server/native-host code and excluded model dependencies.
 
-```sh
-npm run build
-npm run demo
-product/.runtime/bin/python -m product.tests.browser.run
-```
-
-PDFs are generated automatically from first-party text. Only source retrieval is
-controlled; parsing, segmentation, browser APIs and export are real. AI predictions
-are not mocked. The ordinary panel tab substitutes side-panel active-tab semantics
-and loopback document permissions, so production toolbar prompts are not proven.
-Generated PDFs, screenshots and reports are ignored by Git.
-
-`python -m product.tests.browser.model_run --profile product/.local/models-profile.json`
-performs genuine offline Desklib/BGE inference, verifies asset hashes and resource
-abstention, and asserts that uncalibrated document percentages stay unavailable.
-It is a functional smoke test, not an independent accuracy benchmark.
-
-`product.tests.browser.desktop_run` tests actual native messaging against an
-explicit sandbox macOS installation using `--install-root` and `--browser-home`.
-Add `--require-models` for a model-enabled installation to verify genuine prose
-inference in exported segments, safe short-text abstention and setup-status labels.
-Never point it at an unrelated installation. Windows package structure is checked
-with `python -m product.tests.browser.windows_package`; this does not execute
-Windows or prove its browser integration.
-
-## Desktop installers
-
-```sh
-npm run build:installer
-npm run build:installer:windows
-```
-
-The macOS archive must be packaged on macOS. Windows cross-builds additionally need
-Go 1.22+ on the maintainer machine; set `VERITY_GO` if it is not on PATH. End users
-need neither Go nor Python. Portable archive/provisioning tests run with `go test`
-in `product/installer/windows` on macOS/Linux. Set
-`VERITY_WINDOWS_RUNTIME_ARCHIVE` to the pinned archive to test real extraction.
-
-See [distribution](DISTRIBUTION.md) for release gates and [models](MODELS.md) for
-explicit local asset provisioning and calibration.
+Archive and verify the ZIP, then extract it into a new directory and run acceptance
+again. Measure the final ZIP and enforce GitHub's **under 2 GiB per asset** limit.
+Windows CI must build and execute its actual native app; cross-build metadata is
+not acceptance. See [distribution](DISTRIBUTION.md).

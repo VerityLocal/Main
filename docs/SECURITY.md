@@ -1,39 +1,39 @@
 # Privacy and security
 
-Authorship inference runs locally when explicitly provisioned. The extension does
-not send documents to a cloud AI service. Web source comparison is off until the
-user consents: short text excerpts go to search services and candidate public
-sources are retrieved. Opening a remote PDF can contact its original site.
+Verity is a native Python desktop application with an automatically owned worker
+process. It opens no listener port, starts no HTTP server, registers no native
+messaging host and creates no pairing token or login service. Documents,
+preferences and results stay in memory; only explicit JSON/text exports are saved.
+Original PDFs are read only. Exports contain document text: treat them as private.
 
-The desktop helper binds to `127.0.0.1:8790`, requires a bearer token and exact paired
-browser origins, bounds request/concurrency/document sizes, and expires in-memory
-terminal results after 30 minutes. Native startup validates browser caller identity;
-pairing/shutdown requests require authentication. Installer/native-host permissions
-are per-user, not system-wide.
+Local model inference is offline from first launch. Hugging Face/Transformers
+offline flags, telemetry suppression, local-only loaders, safetensors and disabled
+remote code apply before lazy ML imports. Complete asset manifests are checked
+against application-bound pins before cold loading. A hostile local user able to
+rewrite the executable itself is outside this integrity boundary.
 
-Public-source retrieval rejects private-address DNS results and redirects, pins
-connections to validated public IPs, blocks unexpected navigation, frames and
-subresources, and imposes deadlines. It intentionally misses some protected or
-JavaScript-only sources. Missing search results are not proof of originality.
+Optional web comparison is disabled by default. Enabling it in Settings does not
+grant scan consent: Review requires a fresh per-scan checkbox. Short excerpts go
+to public search, then public source pages are fetched; no full-document upload or
+cloud AI analysis occurs. Disabling comparison, editing input or cancelling revokes
+consent. An in-flight consented request may already have sent an excerpt before
+cancellation; cancellation cannot undo remote receipt.
 
-Model loading is local-only with remote code disabled. Optional assets require
-reviewed licenses, exact snapshots and a SHA-256-pinned complete file manifest.
-Changed, missing, extra or linked assets cause abstention. This protects drift, not
-a hostile local user able to rewrite configuration and assets together.
+Source retrieval rejects private-address DNS results and redirects, pins outbound
+connections to validated public IPs, disables scripts/cookies/service workers and
+blocks frames, subresources and unexpected navigation. Deadlines/input bounds apply.
+Protected/JavaScript-only sites or search challenges can fail. Unavailable searches
+are not zero overlap or proof of originality. Opening a source in the user's
+browser is a separately confirmed external navigation.
 
-Approved setup contacts Hugging Face and its reviewed HTTPS download hosts for
-immutable, byte-count/SHA-256-pinned snapshots. This is separate from document
-analysis and transmits no document text. Installers also contact Python package,
-runtime and browser distribution hosts. Initial setup can use substantial disk,
-bandwidth and memory; inference checks physical/available RAM before cold model
-loads. Resource gates are not OS-level isolation or a no-OOM guarantee.
+Inference/PDF extraction stay off the Tk UI thread. Cancel kills the owned worker
+and retrieval-browser descendants rather than waiting for native model/parser
+code to return. This is process isolation, not a hardened OS sandbox. Resource
+gates do not guarantee against OOM or native parser vulnerabilities.
 
-Cancellation is cooperative between segments; an executing native parser/model
-operation may finish before cancellation takes effect. OS resource isolation and
-platform/browser security acceptance remain production gates.
-
-Only the pairing token is persisted by the extension. Exported reports include
-document text: treat them as private. Never commit tokens, signing credentials,
-personal PDFs, model weights or user profiles. The download website has no
-analytics, forms, cookies or third-party scripts; GitHub hosting/downloads receive
-ordinary network metadata such as IP addresses.
+Build-time preparation contacts model, package and browser distribution hosts;
+no user document is involved. Runtime never starts that downloader. Retain all
+license notices; keep credentials, personal files, environments, models and
+generated assets out of Git. Development builds are not Developer ID/notarized or
+Authenticode-signed. Checksums do not replace signing. Website/GitHub downloads
+receive ordinary network metadata such as IP addresses.
