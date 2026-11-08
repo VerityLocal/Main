@@ -2,6 +2,28 @@
 import os
 
 
+def acceptance_network_guard():
+    """Deny outbound test traffic, retaining Windows asyncio's local socket pair."""
+    import ipaddress
+    import socket
+    original_connect = socket.socket.connect
+
+    def guarded_connect(client, address):
+        if client.family in (socket.AF_INET, socket.AF_INET6):
+            try:
+                if ipaddress.ip_address(address[0]).is_loopback:
+                    return original_connect(client, address)
+            except ValueError:
+                pass
+        raise OSError("Acceptance forbids outbound Python network access")
+
+    def denied(*args, **kwargs):
+        raise OSError("Acceptance forbids outbound Python network access")
+
+    socket.socket.connect = guarded_connect
+    socket.create_connection = denied
+
+
 def serve(root, connection):
     if os.name == "posix":
         os.setsid()  # Cancel also stops any consented retrieval-browser descendants.
@@ -11,17 +33,15 @@ def serve(root, connection):
     from product.engine.assets import verify_assets
     from product.engine.pdf import MAX_PDF_BYTES, extract_pdf
     engine = None
+    network_guard_installed = False
     try:
         while True:
             request = connection.recv()
             operation = request["operation"]
             try:
-                if request.get("network_guard"):
-                    import socket
-                    def denied(*args, **kwargs):
-                        raise OSError("Acceptance forbids outbound Python network access")
-                    socket.socket.connect = denied
-                    socket.create_connection = denied
+                if request.get("network_guard") and not network_guard_installed:
+                    acceptance_network_guard()
+                    network_guard_installed = True
                 if operation == "pdf":
                     # Bound reads before allocating or calling native PDF code.
                     with open(request["path"], "rb") as stream:
@@ -79,7 +99,10 @@ def serve(root, connection):
                     message = "PDF extraction failed. Use a text-layer PDF under 16 MiB and 200 pages, or paste its text."
                 if isinstance(error, ValueError) and str(error).startswith(("Readable text", "This document exceeds", "Invalid text encoding")):
                     message = str(error)
-                connection.send({"type": "error", "operation": operation, "message": message})
+                response = {"type": "error", "operation": operation, "message": message}
+                if request.get("diagnostics"):
+                    response["exception_type"] = type(error).__name__
+                connection.send(response)
     except (EOFError, BrokenPipeError, OSError):
         pass
     finally:

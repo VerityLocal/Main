@@ -57,7 +57,7 @@ class Acceptance:
             return
         try:
             if message["type"] == "error":
-                raise AssertionError("unexpected_worker_error")
+                raise AssertionError("unexpected_worker_error: " + message.get("exception_type", "unreported"))
             result = message["result"]
             if self.phase == "verify":
                 self.check("complete_model_hash_verification", result == {"text": "integrity_verified", "semantic": "integrity_verified"})

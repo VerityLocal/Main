@@ -10,6 +10,7 @@ from unittest.mock import patch
 from product.desktop.config import offline_policy, standard_config
 from product.desktop.controller import Controller, export_data, save_export
 from product.desktop.fixtures import SOURCE_TEXT, pdf
+from product.desktop.worker import acceptance_network_guard
 from product.engine.assets import verify_assets
 from product.engine.calibration import Calibration
 from product.engine.detection import DetectionEngine
@@ -91,6 +92,25 @@ class ConfigurationTests(unittest.TestCase):
 
 
 class ControllerTests(unittest.TestCase):
+    def test_acceptance_guard_allows_only_numeric_loopback_socket_pairs(self):
+        import socket
+        with socket.socket() as listener, socket.socket() as client:
+            listener.bind(("127.0.0.1", 0))
+            listener.listen(1)
+            client.settimeout(2)
+            with patch.object(socket.socket, "connect", socket.socket.connect), patch.object(socket, "create_connection", socket.create_connection):
+                acceptance_network_guard()
+                client.connect(listener.getsockname())
+                with listener.accept()[0] as peer:
+                    client.sendall(b"local event loop fixture")
+                    self.assertEqual(peer.recv(100), b"local event loop fixture")
+                for address in (("192.0.2.1", 443), ("example.org", 443), ("localhost", 443)):
+                    with socket.socket() as outbound, self.assertRaisesRegex(OSError, "forbids outbound"):
+                        outbound.connect(address)
+                with self.assertRaisesRegex(OSError, "forbids outbound"):
+                    socket.create_connection(("example.org", 443))
+                self.assertIsNone(DetectionEngine().run(SOURCE_TEXT)["overall"]["ai"]["percent"])
+
     def wait(self, controller):
         deadline = time.monotonic() + 20
         while time.monotonic() < deadline:
