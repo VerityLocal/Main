@@ -2,7 +2,8 @@
 
 Normal users extract and open the platform app ZIP. Commands here are only for
 maintainers. Build **natively** on macOS Apple Silicon or Windows x64 with CPython
-3.11 and working Tcl/Tk. No Node.js, Go, extension or web server is used.
+3.11 and working Tcl/Tk (macOS build: 3.11.12; Windows CI: 3.11.9).
+No Node.js, Go, extension or web server is used.
 
 ## Runtime and model staging
 
