@@ -59,7 +59,7 @@ def verify_archive(path):
         for name in ("licenses/Python/LICENSE.txt", "licenses/Tcl-Tk/Tcl-license.terms", "licenses/Tcl-Tk/Tk-license.terms"):
             if base + name not in entries:
                 raise ValueError("Missing Python/Tcl/Tk license")
-        if not any("/browsers/chromium_headless_shell-" in name and name.endswith(("chrome-headless-shell", "headless_shell.exe")) for name in entries):
+        if not any("/browsers/chromium_headless_shell-" in name and name.endswith(("chrome-headless-shell", "chrome-headless-shell.exe", "headless_shell.exe")) for name in entries):
             raise ValueError("Missing self-contained retrieval browser")
         weights = [name for name in entries if name.endswith(".safetensors")]
         if set(weights) != {name for name in expected if name.endswith(".safetensors")}:
