@@ -104,10 +104,27 @@ class Acceptance:
 
     def cancel_test(self):
         try:
-            process = self.app.controller.process
-            before = time.monotonic()
+            self.cancelled_process = self.app.controller.process
+            self.cancel_started = time.monotonic()
             self.app.cancel()
-            self.check("responsive_hard_cancel", time.monotonic() - before < 0.8 and not process.is_alive() and not self.app.controller.busy and self.app.result is None)
+            elapsed = time.monotonic() - self.cancel_started
+            self.report["cancellation"] = {"ui_return_seconds": round(elapsed, 3)}
+            if elapsed >= 0.8 or self.app.controller.busy or self.app.result is not None:
+                raise AssertionError("responsive_hard_cancel")
+            # Windows termination is asynchronous. Keep pumping Tk while confirming
+            # hard shutdown; never equate a responsive UI with completed cleanup.
+            self.app.after(20, self.confirm_cancel)
+        except Exception as error:
+            self.finish(False, str(error))
+
+    def confirm_cancel(self):
+        try:
+            elapsed = time.monotonic() - self.cancel_started
+            if self.cancelled_process.is_alive() and elapsed < 5:
+                self.app.after(20, self.confirm_cancel)
+                return
+            self.report["cancellation"]["termination_confirmed_seconds"] = round(elapsed, 3)
+            self.check("responsive_hard_cancel", not self.cancelled_process.is_alive() and elapsed < 5)
             self.app.allow_web.set(True)
             self.app.web_setting_changed()
             self.app.consent.set(True)

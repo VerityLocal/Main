@@ -13,6 +13,7 @@ from .worker import serve
 class Controller:
     def __init__(self, root):
         self.root, self.process, self.connection = str(root), None, None
+        self.job = None
         self.busy = False
 
     def submit(self, operation, **payload):
@@ -23,8 +24,19 @@ class Controller:
             parent, child = multiprocessing.get_context("spawn").Pipe()
             self.process = multiprocessing.get_context("spawn").Process(target=serve, args=(self.root, child), daemon=True)
             self.connection = parent
-            self.process.start()
-            child.close()
+            try:
+                if os.name == "nt":
+                    from .windows_job import WindowsJob
+                    self.job = WindowsJob()
+                self.process.start()
+                if self.job:
+                    # Assign before the first request can spawn retrieval descendants.
+                    self.job.assign(self.process.sentinel)
+            except Exception:
+                self.cancel()
+                raise
+            finally:
+                child.close()
         self.connection.send({"operation": operation, **payload})
         self.busy = True
 
@@ -45,6 +57,10 @@ class Controller:
 
     def cancel(self):
         process = self.process
+        job_terminated = bool(self.job and self.job.assigned)
+        if self.job:
+            self.job.close()
+            self.job = None
         if process and process.is_alive():
             if os.name == "posix":
                 try:
@@ -55,18 +71,8 @@ class Controller:
                         process.kill()
                 except ProcessLookupError:
                     pass
-            else:
-                import psutil
-                try:
-                    owner = psutil.Process(process.pid)
-                    for child in owner.children(recursive=True):
-                        try:
-                            child.kill()
-                        except psutil.NoSuchProcess:
-                            pass
-                    owner.kill()
-                except psutil.NoSuchProcess:
-                    pass
+            elif not job_terminated:
+                process.kill()  # Also covers a failed job assignment before dispatch.
             process.join(timeout=0.1)
         if self.connection:
             self.connection.close()

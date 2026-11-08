@@ -18,6 +18,19 @@ from product.engine.resources import ResourceLimit, require_memory
 from product.packaging.prepare import check_pin
 
 
+def windows_child_tree(connection):
+    import subprocess
+    import sys
+    connection.recv()
+    child = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(60)"])
+    connection.send(child.pid)
+    try:
+        connection.recv()
+    finally:
+        child.kill()
+        child.wait()
+
+
 class ConfigurationTests(unittest.TestCase):
     def fixture(self, root):
         pins = {"schema_version": 1, "models": {}}
@@ -92,6 +105,36 @@ class ConfigurationTests(unittest.TestCase):
 
 
 class ControllerTests(unittest.TestCase):
+    @unittest.skipUnless(os.name == "nt", "Requires actual Windows Job Objects")
+    def test_windows_job_closes_entire_owned_process_tree(self):
+        import multiprocessing
+        import psutil
+        from product.desktop.windows_job import WindowsJob
+        parent, child = multiprocessing.get_context("spawn").Pipe()
+        process = multiprocessing.get_context("spawn").Process(target=windows_child_tree, args=(child,))
+        job = WindowsJob()
+        descendant = None
+        try:
+            process.start()
+            child.close()
+            job.assign(process.sentinel)
+            parent.send("start owned descendant")
+            self.assertTrue(parent.poll(10))
+            descendant = psutil.Process(parent.recv())
+            job.close()
+            process.join(5)
+            self.assertFalse(process.is_alive())
+            descendant.wait(5)
+            self.assertFalse(descendant.is_running())
+        finally:
+            job.close()
+            if process.is_alive():
+                process.kill()
+                process.join(5)
+            if descendant and descendant.is_running():
+                descendant.kill()
+            parent.close()
+
     def test_acceptance_guard_allows_only_numeric_loopback_socket_pairs(self):
         import socket
         with socket.socket() as listener, socket.socket() as client:

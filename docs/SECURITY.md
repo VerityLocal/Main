@@ -28,8 +28,9 @@ browser is a separately confirmed external navigation.
 
 Inference/PDF extraction stay off the Tk UI thread. Cancel kills the owned worker
 and retrieval-browser descendants rather than waiting for native model/parser
-code to return. This is process isolation, not a hardened OS sandbox. Resource
-gates do not guarantee against OOM or native parser vulnerabilities.
+code to return. macOS owns a process group; Windows owns a kill-on-close Job
+Object, including descendant processes. This is process isolation, not a hardened
+OS sandbox. Resource gates do not guarantee against OOM or native parser vulnerabilities.
 
 Build-time preparation contacts model, package and browser distribution hosts;
 no user document is involved. Runtime never starts that downloader. Retain all
