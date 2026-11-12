@@ -1,0 +1,11 @@
+{
+  "name": "verity-local",
+  "version": "0.4.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": { "pdfjs-dist": "6.5.438" }
+}

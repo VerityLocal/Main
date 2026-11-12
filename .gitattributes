@@ -1,0 +1,6 @@
+*.pdf binary
+*.png binary
+*.webp binary
+*.model binary
+*.safetensors binary
+*.bin binary

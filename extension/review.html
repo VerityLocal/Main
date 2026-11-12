@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Verity Local — Evidence Review</title><link rel="icon" href="icons/icon-32.png"><link rel="stylesheet" href="styles.css"></head>
+<body><header><div><p class="eyebrow">LOCAL · PRIVATE · EXPERIMENTAL</p><h1>Verity Local <span class="muted">/ Evidence review</span></h1></div><a href="options.html">Settings</a></header>
+<main><aside class="notice"><strong>Signals, not an authorship verdict.</strong> Both detectors are unvalidated for university submissions. Scores can produce false positives and must not be used alone to penalize students.</aside>
+<section class="upload"><label>Select a PDF, Python, JavaScript, or text file<input id="file" type="file" accept=".pdf,.py,.js,.txt"></label>
+<label>Detector threshold<input id="threshold" type="number" min="0" max="1" step="0.05" value="0.5"></label>
+<button id="analyze" disabled>Analyze selected file</button><button id="capture" class="secondary">Use original PDF tab</button><button id="clear" class="secondary">Clear review</button></section>
+<p id="status" role="status" aria-live="polite">Select a file to begin. Maximum upload: 50 MiB.</p><progress id="progress" max="1" value="0" hidden></progress>
+<section id="results" hidden><h2>Document coverage</h2><div id="coverage" class="coverage"></div><details><summary>Extraction warnings and limitations</summary><ul id="warnings"></ul></details>
+<div id="modalities" class="modalities"></div>
+<div class="workspace"><section><h2>Passage evidence</h2><label>Show<select id="filter"><option value="flagged">Flagged passages</option><option value="analyzed">All analyzed passages</option><option value="unscored">Unscored / unsupported content</option><option value="excluded">Excluded / uncertain content</option></select></label><div id="passages"></div></section>
+<section class="viewer"><h2>Original document</h2><p id="location" class="muted">Choose a passage to view its location.</p><div id="pdf-controls" hidden><button id="previous" class="secondary">Previous page</button><span id="page-number"></span><button id="next" class="secondary">Next page</button></div><div id="pdf-wrap"><canvas id="pdf-canvas" hidden></canvas></div><pre id="source-view" hidden></pre></section></div></section>
+</main><script type="module" src="review.js"></script></body></html>

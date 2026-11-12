@@ -1,0 +1,62 @@
+{
+  "product": "PlagiaScan-LM",
+  "artifact": "our code detection adapter",
+  "kind": "lora_over_local_backbone",
+  "r": 16,
+  "alpha": 32,
+  "dropout": 0.05,
+  "targets": [
+    "query",
+    "value"
+  ],
+  "head": "mean-pooled linear",
+  "epochs": 10,
+  "lr": 0.0002,
+  "batch_size": 4,
+  "seed": 42,
+  "dataset_sha256": "52440c16334286c870d9f5dae0e1cb540a57991b150d3b6a4558369e168511b1",
+  "backbone_sha256": "28b61fd8fa069f6bc966f4cb9572a4026ab2a784fca8fb224020d91b744e32d6",
+  "backbone_revision": "3b0952feddeffad0063f274080e3c23d75e7eb39",
+  "hyperparameters": {
+    "optimizer": "adamw",
+    "warmup_fraction": 0.05,
+    "gradient_accumulation": 4,
+    "max_len": 512
+  },
+  "dataset": {
+    "train": 608,
+    "val": 160,
+    "human": 384,
+    "ai": 384,
+    "languages": {
+      "javascript": 384,
+      "python": 384
+    },
+    "train_groups": 38,
+    "val_groups": 10,
+    "kind": "code"
+  },
+  "final_metrics": {
+    "accuracy": 0.78125,
+    "precision": 0.764706,
+    "recall": 0.8125,
+    "f1": 0.787879
+  },
+  "per_language": {
+    "javascript": {
+      "accuracy": 0.8375,
+      "precision": 0.829268,
+      "recall": 0.85,
+      "f1": 0.839506
+    },
+    "python": {
+      "accuracy": 0.725,
+      "precision": 0.704545,
+      "recall": 0.775,
+      "f1": 0.738095
+    }
+  },
+  "training_started_at": "2026-11-11T13:39:22+00:00",
+  "training_ended_at": "2026-11-11T13:51:30+00:00",
+  "training_platform": "macOS-27.2-arm64-arm-64bit-Mach-O"
+}

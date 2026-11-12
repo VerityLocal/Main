@@ -1,0 +1,39 @@
+{
+  "version": "0.4.0",
+  "source": "Actual Chrome extension with real local models",
+  "example": "docs/examples/verity-local-demo.pdf",
+  "example_sha256": "d6dd4826b7f19e7c2afe889af0e87a242d2987f7acf512e603a8679250b472ed",
+  "screenshots": [
+    {
+      "name": "install-extension.webp",
+      "width": 1440,
+      "height": 700
+    },
+    {
+      "name": "settings.webp",
+      "width": 900,
+      "height": 700
+    },
+    {
+      "name": "popup.webp",
+      "width": 380,
+      "height": 600
+    },
+    {
+      "name": "review-overview.webp",
+      "width": 1440,
+      "height": 1000
+    },
+    {
+      "name": "evidence.webp",
+      "width": 1440,
+      "height": 1000
+    }
+  ],
+  "errors": [],
+  "results": {
+    "text": "100.0%",
+    "code": "100.0%",
+    "coverage": "2 pages processed · 2,420 characters analyzed. Some content was not scored; see details. Temporary results expire within 15 minutes."
+  }
+}

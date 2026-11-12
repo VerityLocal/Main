@@ -1,0 +1,16 @@
+.venv-extraction/
+.venv/
+.tools-ocr/
+.local/
+__pycache__/
+*.pyc
+extension/node_modules/
+extension/vendor/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+dist/
+models/**/*.safetensors
+models/**/*.bin

@@ -1,0 +1,11 @@
+# Verity Local backend — versions used for v0.4.0 validation.
+# Python 3.11+ on macOS or Linux (Windows: WSL 2).
+torch==2.13.0
+transformers==5.22.2
+safetensors==0.8.0
+sentencepiece==0.2.2
+fastapi==0.143.0
+pydantic==2.14.1
+uvicorn==0.54.0
+pdfplumber==0.11.10
+Pillow==12.3.0

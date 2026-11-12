@@ -1,0 +1,21 @@
+.popup { width:380px; min-width:380px; font-size:13px; }
+.popup header { padding:16px 20px; }
+.popup h1 { font-size:21px; margin:4px 0 0; }
+.popup main { padding:14px 20px 16px; }
+.popup .icon { padding:6px 10px; font-size:20px; }
+.filename { margin:0 0 8px; font-weight:650; overflow-wrap:anywhere; max-height:42px; overflow:hidden; }
+.popup #status { margin:0 0 12px; overflow-wrap:anywhere; }
+.score-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; margin:12px 0; }
+.popup .card { min-width:0; padding:12px; }
+.popup h2 { font-size:13px; margin:0; }
+.popup .metric { font-size:29px; margin:8px 0 2px; line-height:1.2; }
+.popup .card .muted { margin:6px 0 0; font-size:11px; }
+.popup .primary { width:100%; margin:10px 0 0; }
+.actions { display:flex; gap:8px; margin:8px 0; }
+.actions button { flex:1; padding:7px 12px; }
+.file-fallback { margin:10px 0 0; }
+.file-fallback summary { cursor:pointer; color:#176454; font-size:12px; }
+.file-choice { margin-top:8px; }
+.file-choice input { width:100%; font-size:12px; padding:7px; }
+.popup .text-button { padding:8px 0; border:0; background:none; color:#176454; font-size:12px; }
+.popup .notice { font-size:11px; line-height:1.5; padding:8px 10px; margin:10px 0; }

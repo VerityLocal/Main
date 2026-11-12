@@ -1,0 +1,98 @@
+{
+  "seed": 42,
+  "task": "ai-vs-human-code",
+  "dataset_sha256": "52440c16334286c870d9f5dae0e1cb540a57991b150d3b6a4558369e168511b1",
+  "backbone_sha256": "28b61fd8fa069f6bc966f4cb9572a4026ab2a784fca8fb224020d91b744e32d6",
+  "epochs": [
+    {
+      "epoch": 1,
+      "train_loss": 0.701006,
+      "val_loss": 0.663406,
+      "val_acc": 0.7125,
+      "val_f1": 0.744444
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.608863,
+      "val_loss": 0.530774,
+      "val_acc": 0.74375,
+      "val_f1": 0.751515
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.517025,
+      "val_loss": 0.527199,
+      "val_acc": 0.75625,
+      "val_f1": 0.748387
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.509985,
+      "val_loss": 0.520557,
+      "val_acc": 0.7625,
+      "val_f1": 0.776471
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.480426,
+      "val_loss": 0.547643,
+      "val_acc": 0.75625,
+      "val_f1": 0.738255
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.47973,
+      "val_loss": 0.520971,
+      "val_acc": 0.775,
+      "val_f1": 0.777778
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.462611,
+      "val_loss": 0.526405,
+      "val_acc": 0.78125,
+      "val_f1": 0.790419
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.464858,
+      "val_loss": 0.527691,
+      "val_acc": 0.775,
+      "val_f1": 0.777778
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.458339,
+      "val_loss": 0.5242,
+      "val_acc": 0.7875,
+      "val_f1": 0.792683
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.455126,
+      "val_loss": 0.524258,
+      "val_acc": 0.78125,
+      "val_f1": 0.787879
+    }
+  ],
+  "final": {
+    "accuracy": 0.78125,
+    "precision": 0.764706,
+    "recall": 0.8125,
+    "f1": 0.787879
+  },
+  "per_language": {
+    "javascript": {
+      "accuracy": 0.8375,
+      "precision": 0.829268,
+      "recall": 0.85,
+      "f1": 0.839506
+    },
+    "python": {
+      "accuracy": 0.725,
+      "precision": 0.704545,
+      "recall": 0.775,
+      "f1": 0.738095
+    }
+  }
+}

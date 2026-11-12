@@ -1,0 +1,17 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Verity Local</title><link rel="icon" href="icons/icon-32.png"><link rel="stylesheet" href="styles.css"><link rel="stylesheet" href="popup.css"></head>
+<body class="popup"><header><div><p class="eyebrow">LOCAL · PRIVATE</p><h1>Verity Local</h1></div><button id="settings" class="icon secondary" aria-label="Open settings">⚙</button></header>
+<main><p id="filename" class="filename">Current PDF</p>
+<p id="status" role="status" aria-live="polite">Checking the current tab…</p><progress id="progress" max="1" value="0" hidden></progress>
+<section id="scores" class="score-grid" aria-label="Detector results" hidden>
+<article class="card"><h2>AI-text flag rate</h2><p id="text-score" class="metric">Not scored</p><p id="text-status" class="muted"></p></article>
+<article class="card"><h2>AI-code flag rate</h2><p id="code-score" class="metric">Not scored</p><p id="code-status" class="muted"></p></article></section>
+<p id="coverage" class="muted" hidden></p>
+<aside class="notice">Share flagged within <strong>analyzed</strong> text/code—not verified AI authorship. Detectors are unvalidated for university submissions.</aside>
+<button id="permission" class="primary" hidden>Allow this site &amp; analyze</button>
+<button id="local-access" class="secondary" hidden>Enable local-file access</button>
+<button id="details" class="primary" disabled hidden>View detailed results ↗</button>
+<div class="actions"><button id="retry" class="secondary" hidden>Re-analyze</button><button id="clear" class="secondary" hidden>Clear</button></div>
+<details id="fallback" class="file-fallback"><summary>Choose PDF instead</summary><label class="file-choice">Select a PDF (up to 50 MiB)<input id="file" type="file" accept=".pdf,application/pdf"></label></details>
+<button id="manual-review" class="text-button">Open manual PDF/source review ↗</button>
+</main><script type="module" src="popup.js"></script></body></html>
